@@ -114,7 +114,7 @@ class CategoryController{
             const category = await Category.findByPk(id);
     
             if (!category) {
-                return next(ApiError.notFound('Category not found'));
+                return next(ApiError.notFound('Категорія не знайдена'));
             }
             if (name) {
                 category.name = name;
