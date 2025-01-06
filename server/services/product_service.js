@@ -35,21 +35,27 @@ class ProductService {
     }
 
     async getAllProducts(query) {
-        const { brandId, categoryId, limit = 12, page = 1 } = query;
-        const offset = page * limit - limit;
+        const { brandId, categoryId, limit = 12, page = 1 } = query
+        const offset = page * limit - limit
     
         let filter = {};
-        if (brandId) filter.brandId = brandId;
+        if (brandId) filter.brandId = brandId
     
         if (categoryId) {
             const subcategoryIds = await product_repository.getSubcategories(categoryId);
-            filter.categoryId = { [Op.in]: [categoryId, ...subcategoryIds] };
+            filter.categoryId = { [Op.in]: [categoryId, ...subcategoryIds] }
         }
     
-        return await product_repository.getAllProducts(filter, limit, offset);
+        return await product_repository.getAllProducts(filter, limit, offset)
     }
     async getProduct(id) {
         return await product_repository.getProductById(id);
+    }
+    async searchProductByName(query){
+        const { name, limit = 12, page = 1 } = query
+        const offset = page * limit - limit
+        return await product_repository.searchByName(name, limit, offset)
+
     }
     async changeProduct(id, data) {
         return await product_repository.updateProduct(id, data);

@@ -181,6 +181,15 @@ class ProductController{
              next(ApiError.badRequest(error.message)) 
         }
     }
+
+    async searchProductByName(req, res, next){
+        try {
+            const products = await product_service.searchProductByName(req.query)
+            return res.status(200).json(products)
+        } catch (error) {
+             next(ApiError.badRequest(error.message)) 
+        }
+    }
     
     async changeProduct(req, res, next){
         try {

@@ -1,10 +1,10 @@
 const {Product, ProductFeatures, Category} = require('../models/models')
+const { Op } = require("sequelize");
 
 class ProductRepository{
     async createProduct(data){
         return await Product.create(data)
     }
-
     async deleteProduct(id){
         const product = await Product.findByPk(id)
         if(product){
@@ -20,6 +20,14 @@ class ProductRepository{
     async getProductById(id) {
         return await Product.findByPk(id);
     }
+    async searchByName(name, limit, offset) {
+        if (!name) return { count: 0, rows: [] };
+        return await Product.findAndCountAll({
+            where: { name: { [Op.iLike]: `%${name}%` } },
+            limit,
+            offset,
+        });
+    }
     async getAllProducts(filter, limit, offset) {
         return await Product.findAndCountAll({
             where: filter,
@@ -27,7 +35,6 @@ class ProductRepository{
             offset,
         });
     }
-
     async getSubcategories(parentId) {
         const subcategories = await Category.findAll({ where: { parentId } });
         let ids = subcategories.map(sub => sub.id);
