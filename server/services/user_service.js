@@ -1,5 +1,7 @@
 const user_repository = require('../repositories/user_repository')
 const {createJWT} = require('../utils/jwt')
+const uuid = require('uuid')
+const path = require('path')
 
 class UserService{
     async registerUser(data){
@@ -28,6 +30,29 @@ class UserService{
     }
     async getAllUsers(){
         return await user_repository.getAllUsers()
+    }
+    async changeUserProfile(id, data, files){
+        const user = await user_repository.getUserById(id)
+        if(!user){
+            throw new Error(`Користувача не існує`)
+        }
+        const { img } = files;
+        if (img) {
+            if (img.mimetype.startsWith('image')) {
+                const fileName = uuid.v4() + ".jpg";
+                const uploadPath = path.resolve(__dirname, '..', 'static', fileName);
+    
+                await img.mv(uploadPath, (err) => {
+                    if (err) {
+                        throw new Error('Не вдалося завантажити зображення');
+                    }
+                });
+                data.img = fileName;
+            } else {
+                throw new Error('Файл не є зображенням');
+            }
+        }
+        return await user_repository.updateUserProfile(id, data)
     }
 }
 module.exports = new UserService()

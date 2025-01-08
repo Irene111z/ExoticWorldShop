@@ -45,6 +45,15 @@ class UserController{
             next(ApiError.badRequest(error.message)) 
         }
     }
+    async editUserProfile(req, res, next)
+    {
+        try {
+            const profile = await user_service.changeUserProfile(req.params.id, req.body, req.files)
+            res.status(200).json(profile);
+        } catch (error) {
+            next(ApiError.badRequest(error.message)) 
+        }
+    }
 }
 
 module.exports = new UserController()
