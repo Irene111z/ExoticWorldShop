@@ -1,20 +1,35 @@
 const sequelize = require('../database')
 const {DataTypes} = require('sequelize')
+const bcrypt = require('bcrypt')
 
 const User = sequelize.define(
     'user',
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        email:{type:DataTypes.STRING, unique:true},
-        password:{type:DataTypes.STRING},
+        email:{type:DataTypes.STRING, unique:true, allowNull:false},
+        password:{type:DataTypes.STRING, allowNull:false},
         role:{type:DataTypes.STRING, defaultValue:'user'},
         img:{type:DataTypes.STRING, allowNull:true},
         name:{type:DataTypes.STRING, allowNull:false},
         lastname:{type:DataTypes.STRING, allowNull:false},
         phone:{type:DataTypes.STRING, allowNull:false, unique:true},
         delivery_info:{type:DataTypes.STRING, allowNull:true}
+    }, {
+        hooks: {
+            beforeCreate: async (user) => {
+                user.password = await bcrypt.hash(user.password, 5);
+            },
+            beforeUpdate: async (user) => {
+                if (user.changed('password')) {
+                    user.password = await bcrypt.hash(user.password, 5);
+                }
+            },
+        },
     }
 )
+User.prototype.validatePassword = async function (password) {
+    return bcrypt.compare(password, this.password);
+};
 
 const Product = sequelize.define(
     'product',
