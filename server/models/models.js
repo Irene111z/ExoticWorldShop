@@ -73,8 +73,7 @@ const Brand = sequelize.define(
 const Cart = sequelize.define(
     'cart',
     {
-        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        total:{type:DataTypes.INTEGER}
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true}
         //user_id
     }
 )

@@ -1,6 +1,7 @@
 const ApiError = require('../errors/ApiError')
-const {User, Cart} = require('../models/models')
 const { query } = require('../database')
+const cart_service = require('../services/cart_service')
+
 class CartController{
     async getCart(req, res, next){
         try {

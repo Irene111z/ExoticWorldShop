@@ -30,7 +30,8 @@ class UserController{
     }
     async getUserProfile(req, res, next){
         try {
-            const userProfile = await user_service.getUserById(req.params.id)
+            const userId = req.user.id
+            const userProfile = await user_service.getUserById(userId)
             res.status(200).json(userProfile);
         }
         catch (error) {
@@ -48,7 +49,8 @@ class UserController{
     async editUserProfile(req, res, next)
     {
         try {
-            const profile = await user_service.changeUserProfile(req.params.id, req.body, req.files)
+            const userId = req.user.id
+            const profile = await user_service.changeUserProfile(userId, req.body, req.files)
             res.status(200).json(profile);
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
