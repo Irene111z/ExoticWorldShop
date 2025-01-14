@@ -91,7 +91,6 @@ const Wishlist = sequelize.define(
     'wishlist',
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        //product_id
         //user_id
     }
 )
