@@ -23,9 +23,25 @@ class WishlistRepository{
         return await Wishlist.findOne({where:{userId}})
     }
     async addProduct(wishlistId, productId){
+        const product = await Product.findByPk(productId)
+        if(!product){
+            throw new Error("Товар не знайдено")
+        }
+        const wishlistProduct = await WishlistProduct.findOne({where:{wishlistId, productId}})
+        if(wishlistProduct){
+            throw new Error("Товар вже додано до списку бажань")
+        }
         return await WishlistProduct.create({wishlistId, productId})
     }
     async removeProduct(wishlistId, productId){
+        const product = await Product.findByPk(productId)
+        if(!product){
+            throw new Error("Товар не знайдено")
+        }
+        const wishlistProduct = await WishlistProduct.findOne({where:{wishlistId, productId}})
+        if(!wishlistProduct){
+            throw new Error("Товар не знайдено в списку бажань")
+        }
         return await WishlistProduct.destroy({ where: { wishlistId, productId } });
     }
     async clearWishlist(wishlistId){

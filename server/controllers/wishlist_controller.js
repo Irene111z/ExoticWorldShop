@@ -34,9 +34,12 @@ class WishlistController{
     async deleteProductFromWishlist(req, res, next){
         try {
             const userId = req.user.id
-            const productId = req.body.productId
-            if (!userId || !productId) {
-                return next(ApiError.badRequest("Відсутні userId або productId"));
+            const {productId} = req.params
+            if (!userId) {
+                return next(ApiError.badRequest("Відсутній userId"));
+            }
+            if (!productId) {
+                return next(ApiError.badRequest("Відсутній productId"));
             }
             const wishlist = await wishlist_service.removeProduct(userId, productId)
             return res.status(200).json(wishlist)
