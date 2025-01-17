@@ -1,7 +1,5 @@
 const user_repository = require('../repositories/user_repository')
 const cart_repository = require('../repositories/cart_repository')
-const wishlist_repository = require('../repositories/wishlist_repository')
-//const blog_repository = require('../repositories/blog_repository')
 const {createJWT} = require('../utils/jwt')
 const uuid = require('uuid')
 const path = require('path')
@@ -14,8 +12,6 @@ class UserService{
         }
         const user = await user_repository.createUser(data)
         await cart_repository.createCart(user.id)
-        await wishlist_repository.createWishlist(user.id)
-        //await blog_repository.createUserBookmarks(user.id)
         return createJWT(user.id, user.email, user.role)
     }
     async loginUser(data){

@@ -5,18 +5,15 @@ class WishlistService{
         return await wishlist_repository.getWishlistProducts(userId)
     }
     async addProduct(userId, productId){
-        const wishlist = await wishlist_repository.getWishlistByUserId(userId)
-        await wishlist_repository.addProduct(wishlist.id, productId)
+        await wishlist_repository.addProduct(userId, productId)
         return await wishlist_repository.getWishlistProducts(userId)
     }
     async removeProduct(userId, productId){
-        const wishlist = await wishlist_repository.getWishlistByUserId(userId)
-        await wishlist_repository.removeProduct(wishlist.id, productId)
+        await wishlist_repository.removeProduct(userId, productId)
         return await wishlist_repository.getWishlistProducts(userId)
     }
     async clearWishlist(userId){
-        const wishlist = await wishlist_repository.getWishlistByUserId(userId)
-        await wishlist_repository.clearWishlist(wishlist.id)
+        await wishlist_repository.clearWishlist(userId)
         return await wishlist_repository.getWishlistProducts(userId)
     }
 }

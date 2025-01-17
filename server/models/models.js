@@ -45,6 +45,28 @@ const Product = sequelize.define(
         //category
     }
 )
+const Post = sequelize.define(
+    'post',
+    {
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        title:{type:DataTypes.STRING, unique:true, allowNull:false},
+        preview:{type:DataTypes.STRING, allowNull:false},
+        content:{type:DataTypes.STRING, allowNull:false},
+        //data_created
+    }
+)
+const Author = sequelize.define(
+    'author',
+    {
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        name:{type:DataTypes.STRING,allowNull:false},
+        lastname:{type:DataTypes.STRING,  allowNull:false},
+        occupation:{type:DataTypes.STRING, allowNull:false},
+        workplace:{type:DataTypes.STRING, allowNull:false},
+        sity:{type:DataTypes.STRING, allowNull:true},
+        //data_created
+    }
+)
 
 const Category = sequelize.define(
     'category',
@@ -87,14 +109,6 @@ const CartItem = sequelize.define(
     }
 )
 
-const Wishlist = sequelize.define(
-    'wishlist',
-    {
-        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        //user_id
-    }
-)
-
 const Review = sequelize.define(
     'review',
     {
@@ -117,8 +131,6 @@ const ProductFeatures = sequelize.define(
 
 User.hasOne(Cart)
 Cart.belongsTo(User)
-User.hasOne(Wishlist)
-Wishlist.belongsTo(User)
 User.hasMany(Review)
 Review.belongsTo(User)
 Cart.hasMany(CartItem)
@@ -136,14 +148,35 @@ CartItem.belongsTo(Product)
 Product.hasMany(ProductFeatures)
 ProductFeatures.belongsTo(Product)
 
-const WishlistProduct = sequelize.define('wishlist_product',
+const Wishlist = sequelize.define(
+    'wishlist',
+    {
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        //userId
+        //productId
+    }
+)
+
+User.belongsToMany(Product, { through: Wishlist});
+Product.belongsToMany(User, { through: Wishlist});
+
+const PostAuthor = sequelize.define('post_author',
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
     }
 )
 
-Wishlist.belongsToMany(Product, { through: WishlistProduct});
-Product.belongsToMany(Wishlist, { through: WishlistProduct});
+Post.belongsToMany(Author, { through: PostAuthor});
+Author.belongsToMany(Post, { through: PostAuthor});
+
+const SavedPost = sequelize.define('saved_post', 
+    {
+        id: { type: DataTypes.INTEGER, unique: true, primaryKey: true, autoIncrement: true },
+    }
+);
+
+User.belongsToMany(Post, { through: SavedPost });
+Post.belongsToMany(User, { through: SavedPost });
 
 const BrandCategory = sequelize.define('brand_category',
     {
@@ -163,7 +196,11 @@ module.exports = {
     Review,
     ProductFeatures,
     Brand,
-    WishlistProduct,
+    Post,
+    Author,
+    PostAuthor,
+    Wishlist,
+    SavedPost,
     BrandCategory
 }
 
