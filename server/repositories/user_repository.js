@@ -1,4 +1,4 @@
-const {User, Cart} = require('../models/models')
+const {User} = require('../models/models')
 
 class UserRepository{
     async getUserByEmail(email){
@@ -6,9 +6,6 @@ class UserRepository{
     }
     async createUser(data){
         return await User.create(data)
-    }
-    async createUserCart(id){
-        return await Cart.create({userId:id})
     }
     async getUserById(id){
         return await User.findByPk(id)

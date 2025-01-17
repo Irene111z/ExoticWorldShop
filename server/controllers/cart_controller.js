@@ -5,7 +5,8 @@ const cart_service = require('../services/cart_service')
 class CartController{
     async getCart(req, res, next){
         try {
-            const cart = await cart_service.getUserCart(req.user.id)
+            const userId = req.user.id
+            const cart = await cart_service.getCart(userId)
             return res.status(200).json(cart)
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
@@ -13,15 +14,19 @@ class CartController{
     }
     async addProductToCart(req, res, next){
         try {
-            const cartItem = await cart_service.addProductToCart(req.user.id, req.body)
-            return res.status(200).json(cartItem)
+            const userId = req.user.id
+            const {productId, quantity} = req.body
+            const cart = await cart_service.addProductToCart(userId, productId, quantity || 1)
+            return res.status(200).json(cart)
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
         }
     }
     async deleteProductFromCart(req, res, next){
         try {
-            await cart_service.removeProductFromCart(req.user.id)
+            const userId = req.user.id
+            const {productId} = req.body
+            await cart_service.removeProductFromCart(userId, productId)
             return res.status(200).json({message:"Товар був видалений з кошику"})
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
@@ -29,7 +34,9 @@ class CartController{
     }
     async increaseCartItem(req, res, next){
         try {
-            const cartItem = await cart_service.incCartItem(req.user.id, req.body)
+            const userId = req.user.id
+            const {productId} = req.body
+            const cartItem = await cart_service.incCartItem(userId, productId)
             return res.status(200).json(cartItem)
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
@@ -37,7 +44,9 @@ class CartController{
     }
     async decreaseCartItem(req, res, next){
         try {
-            const cartItem = await cart_service.decCartItem(req.user.id, req.body)
+            const userId = req.user.id
+            const {productId} = req.body
+            const cartItem = await cart_service.decCartItem(userId, productId)
             return res.status(200).json(cartItem)
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
@@ -45,7 +54,8 @@ class CartController{
     }
     async clearCart(req, res, next){
         try {
-            await cart_service.clearCart(req.user.id)
+            const userId = req.user.id
+            await cart_service.clearCart(userId)
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
         }

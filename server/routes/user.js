@@ -4,7 +4,7 @@ const user_controller = require('../controllers/user_controller')
 const AuthorizationMiddleware = require('../middleware/AuthorizationMiddleware')
 const roleControll = require('../middleware/RoleControllMiddleware')
 
-router.post('/registration', user_controller.registration)
+router.post('/reg', user_controller.registration)
 router.post('/login', user_controller.login)
 router.get('/auth', AuthorizationMiddleware, user_controller.auth)
 router.get('/profile', AuthorizationMiddleware, user_controller.getUserProfile)

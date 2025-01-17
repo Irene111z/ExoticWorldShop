@@ -1,9 +1,12 @@
 const {Product, Cart, CartItem} = require('../models/models')
 
 class CartRepository{
-    async getCart(cartId){
+    async createCart(userId) {
+        return await Cart.create({ userId });
+    }
+    async getCartProducts(userId){
         return await Cart.findOne({
-            where: { id: cartId },
+            where: { userId },
             include: [
                 {
                     model: CartItem,
@@ -12,21 +15,28 @@ class CartRepository{
             ],
         })
     }
+    async getCartByUserId(userId){
+        return await Cart.findOne({where:{userId}})
+    }
     async addCartItem(cartId, productId, quantity){
         const cartItem = await CartItem.findOne({where:{cartId, productId}})
         const product = await Product.findOne({ where: { id: productId } })
+        quantity = Number(quantity)
         if(!product){
             throw new Error("Товар не знайдено")
         }
         if (product.quantity < quantity) {
-            throw new Error(`Недостатньо товару на складі, усього залишилося ${quantity} од.`);
+            throw new Error(`Недостатньо товару на складі, усього залишилося ${product.quantity} од.`);
         }
-        if(cartItem){
-            cartItem.quantity += quantity
-            if (product.quantity < cartItem.quantity) {
+        if(cartItem){ 
+            const currentQuantity = cartItem.quantity;
+            const newQuantity = currentQuantity + quantity;
+            console.log('Нова кількість товару в кошику:', newQuantity);
+            if (product.quantity < newQuantity) {
                 throw new Error('Недостатньо товару на складі');
             }
-            await cartItem.save()
+            cartItem.quantity = newQuantity;
+            await cartItem.save();
         }
         else{
             await CartItem.create({cartId, productId, quantity})
@@ -37,6 +47,9 @@ class CartRepository{
     }
     async incCartItem(cartId, productId){
         const cartItem = await CartItem.findOne({where:{cartId, productId}})
+        if(!cartItem){
+            throw new Error("Товару немає в кошику")
+        }
         const product = await Product.findOne({ where: { id: productId } });
         if (product.quantity <= cartItem.quantity) {
             throw new Error('Недостатньо товару на складі');
@@ -46,6 +59,9 @@ class CartRepository{
     }
     async decCartItem(cartId, productId){
         const cartItem = await CartItem.findOne({where:{cartId, productId}})
+        if(!cartItem){
+            throw new Error("Товару немає в кошику")
+        }
         if (cartItem.quantity <= 1) {
             await cartItem.destroy();
         }
