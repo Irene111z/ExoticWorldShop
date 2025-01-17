@@ -1,5 +1,4 @@
 const ApiError = require('../errors/ApiError')
-const { query } = require('../database')
 const cart_service = require('../services/cart_service')
 
 class CartController{
@@ -25,7 +24,8 @@ class CartController{
     async deleteProductFromCart(req, res, next){
         try {
             const userId = req.user.id
-            const {productId} = req.body
+            const {productId} = req.params
+            console.log('Product ID:', productId);
             await cart_service.removeProductFromCart(userId, productId)
             return res.status(200).json({message:"Товар був видалений з кошику"})
         } catch (error) {
@@ -56,6 +56,7 @@ class CartController{
         try {
             const userId = req.user.id
             await cart_service.clearCart(userId)
+            return res.status(200).json({message:"Кошик успішно було очищено!"})
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
         }
