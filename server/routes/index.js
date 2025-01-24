@@ -7,6 +7,9 @@ const brand = require('./brand')
 const category = require('./category')
 const cart = require('./cart')
 const wishlist = require('./wishlist')
+const author = require('./author')
+// const blog = require('./blog')
+// const bookmarks = require('./bookmarks')
 
 router.use('/user', user)
 router.use('/category', category)
@@ -14,5 +17,8 @@ router.use('/product', product)
 router.use('/brand', brand)
 router.use('/cart', cart)
 router.use('/wishlist', wishlist)
+router.use('/author', author)
+// router.use('/blog', blog)
+// router.use('/bookmarks', bookmarks)
 
 module.exports = router
