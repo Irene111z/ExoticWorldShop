@@ -40,7 +40,7 @@ const Product = sequelize.define(
         disc_price:{type:DataTypes.INTEGER},
         rating:{type:DataTypes.INTEGER, defaultValue:0},
         img:{type:DataTypes.STRING, allowNull:false},
-        description:{type:DataTypes.STRING, allowNull:false},
+        description:{type:DataTypes.TEXT, allowNull:false},
         quantity:{type:DataTypes.INTEGER, defaultValue:0},
         //category
     }
@@ -51,7 +51,7 @@ const Post = sequelize.define(
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
         title:{type:DataTypes.STRING, unique:true, allowNull:false},
         preview:{type:DataTypes.STRING, allowNull:false},
-        content:{type:DataTypes.STRING, allowNull:false},
+        content:{type:DataTypes.TEXT, allowNull:false},
         //data_created
     }
 )
