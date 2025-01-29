@@ -54,6 +54,38 @@ class ProductController{
              next(ApiError.badRequest(error.message)) 
         }
     }
+
+    async getProductReviews(req, res, next){
+        try {
+            const reviews = await product_service.getProductReviews(req.params.id)
+            return res.status(200).json(reviews)
+        } catch (error) {
+             next(ApiError.badRequest(error.message)) 
+        }
+    }
+
+    async createProductReview(req, res, next){
+        try {
+            await product_service.createProductReview(req.user.id, req.params.id, req.body)
+            const reviews = await product_service.getProductReviews(req.params.id)
+            return res.status(200).json(reviews)
+        } catch (error) {
+             next(ApiError.badRequest(error.message)) 
+        }
+    }
+
+    async deleteProductReview(req, res, next){
+        try {
+            const product = await product_service.findProductByReviewId(req.params.id)
+
+            await product_service.deleteProductReview(req.user.id, req.params.id)
+
+            const reviews = await product_service.getProductReviews(product.id)
+            return res.status(200).json(reviews)
+        } catch (error) {
+             next(ApiError.badRequest(error.message)) 
+        }
+    }
 }
 
 module.exports = new ProductController()

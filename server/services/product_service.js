@@ -2,6 +2,7 @@ const product_repository = require('../repositories/product_repository')
 const uuid = require('uuid')
 const path = require('path')
 const { Op } = require('sequelize');
+const { Review } = require('../models/models');
 
 class ProductService {
     async createProduct(data, files){
@@ -49,7 +50,7 @@ class ProductService {
         return await product_repository.getAllProducts(filter, limit, offset)
     }
     async getProduct(id) {
-        return await product_repository.getProductById(id);
+        return await product_repository.getProduct(id);
     }
     async searchProductByName(query){
         const { name, limit = 12, page = 1 } = query
@@ -59,6 +60,44 @@ class ProductService {
     }
     async changeProduct(id, data) {
         return await product_repository.updateProduct(id, data);
+    }
+    async getProductReviews(productId){
+        const product = await product_repository.getProductById(productId)
+        if(!product){
+            throw new Error("Товар не знайдено")
+        }
+        return await product_repository.getProductReviews(productId)
+    }
+    async createProductReview(userId, productId, data){
+        const product = await product_repository.getProductById(productId)
+        if(!product){
+            throw new Error("Товар не знайдено")
+        }
+        const hasReviewed = await product_repository.hasUserReviewedProduct(userId, productId)
+        if(hasReviewed){
+            throw new Error("Ви вже залишали відгук для цього товару")
+        }
+        const {rate, comment} = data
+        if(!rate){
+            throw new Error("Оцінка товару обов'язкова для залишення відгуку")
+        }
+        if(rate > 5 || rate < 1){
+            throw new Error("Оцінка товару обов'язкова (1-5)")
+        }
+        return await product_repository.createProductReview({userId, productId, rate, comment})
+    }
+    async deleteProductReview(userId, reviewId){
+        const review = await product_repository.getReviewById(reviewId)
+        if(!review){
+            throw new Error("Відгук не знайдено")
+        }
+        if(userId !== review.userId){
+            throw new Error("Недостатньо прав для видалення чужого відгуку")
+        }
+        return await product_repository.deleteProductReview(review)
+    }
+    async findProductByReviewId(reviewId){
+        return await product_repository.findProductByReviewId(reviewId)
     }
 }
 

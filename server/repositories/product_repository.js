@@ -1,4 +1,4 @@
-const {Product, ProductFeatures, Category} = require('../models/models')
+const {Product, ProductFeatures, Category, Review} = require('../models/models')
 const { Op } = require("sequelize");
 
 class ProductRepository{
@@ -12,10 +12,22 @@ class ProductRepository{
         }
     }
     async getProduct(id) {
-        return await Product.findOne({
+        const product = await Product.findOne({
             where: { id },
-            include: [{ model: ProductFeatures }],
+            include: [
+                { model: ProductFeatures },
+                { model: Review, attributes: ['rate'] }
+            ],
         });
+    
+        if (!product){
+            throw new Error("Товар не знайдено")
+        }
+        
+        const ratings = product.reviews.map(review => review.rate);
+        const averageRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+    
+        return { ...product.toJSON(), averageRating: parseFloat(averageRating.toFixed(2)) };
     }
     async getProductById(id) {
         return await Product.findByPk(id);
@@ -54,6 +66,29 @@ class ProductRepository{
 
         Object.assign(product, data);
         return await product.save();
+    }
+    async getProductReviews(productId){
+        return await Review.findAndCountAll({where:{productId}})
+    }
+    async createProductReview(data){
+        return await Review.create(data)
+    }
+    async findProductByReviewId(reviewId){
+        reviewId = Number(reviewId)
+        const review = await Review.findByPk(reviewId)
+        if(!review){
+            throw new Error("Відгук не знайдено")
+        }
+        return await Product.findOne({where:{id:review.productId}})
+    }
+    async getReviewById(reviewId){
+        return await Review.findByPk(reviewId)
+    }
+    async deleteProductReview(review){
+        return await review.destroy()
+    }
+    async hasUserReviewedProduct(userId, productId){
+        return await Review.findOne({where:{userId, productId}})
     }
 }
 

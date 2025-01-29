@@ -38,7 +38,6 @@ const Product = sequelize.define(
         name:{type:DataTypes.STRING, unique:true, allowNull:false},
         price:{type:DataTypes.INTEGER, allowNull:false},
         disc_price:{type:DataTypes.INTEGER},
-        rating:{type:DataTypes.INTEGER, defaultValue:0},
         img:{type:DataTypes.STRING, allowNull:false},
         description:{type:DataTypes.TEXT, allowNull:false},
         quantity:{type:DataTypes.INTEGER, defaultValue:0},
