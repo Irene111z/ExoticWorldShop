@@ -169,14 +169,17 @@ const PostAuthor = sequelize.define('post_author',
 Post.belongsToMany(Author, { through: PostAuthor});
 Author.belongsToMany(Post, { through: PostAuthor});
 
-const SavedPost = sequelize.define('saved_post', 
+const Bookmarks = sequelize.define(
+    'bookmarks',
     {
-        id: { type: DataTypes.INTEGER, unique: true, primaryKey: true, autoIncrement: true },
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        //userId
+        //PostId
     }
-);
+)
 
-User.belongsToMany(Post, { through: SavedPost });
-Post.belongsToMany(User, { through: SavedPost });
+User.belongsToMany(Post, { through: Bookmarks});
+Post.belongsToMany(User, { through: Bookmarks});
 
 const BrandCategory = sequelize.define('brand_category',
     {
@@ -191,7 +194,6 @@ module.exports = {
     Product,
     Cart,
     CartItem,
-    Wishlist,
     Category,
     Review,
     ProductFeatures,
@@ -200,7 +202,7 @@ module.exports = {
     Author,
     PostAuthor,
     Wishlist,
-    SavedPost,
+    Bookmarks,
     BrandCategory
 }
 

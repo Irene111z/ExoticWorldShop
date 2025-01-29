@@ -1,10 +1,11 @@
-// const Router = require('express')
-// const router = new Router()
-// const brand_controller = require('../controllers/brand_controller')
-// const roleControll = require('../middleware/RoleControllMiddleware')
+const Router = require('express')
+const router = new Router()
+const bookmarks_controller = require('../controllers/bookmarks_controller')
+const AuthorizationMiddleware = require('../middleware/AuthorizationMiddleware')
 
-// router.post('/', roleControll('admin'), brand_controller.createBrand)
-// router.get('/', brand_controller.getAllBrands)
-// router.delete('/:id', roleControll('admin'), brand_controller.deleteBrand)
+router.get('/', AuthorizationMiddleware, bookmarks_controller.getBookmarks)
+router.post('/post', AuthorizationMiddleware, bookmarks_controller.savePost)
+router.delete('/post/:postId', AuthorizationMiddleware, bookmarks_controller.unsavePost)
+router.delete('/', AuthorizationMiddleware, bookmarks_controller.clearBookmarks)
 
-// module.exports = router
+module.exports = router
