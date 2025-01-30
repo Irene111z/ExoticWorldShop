@@ -6,13 +6,15 @@ const User = sequelize.define(
     'user',
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        email:{type:DataTypes.STRING, unique:true, allowNull:false},
+        email:{type:DataTypes.STRING, unique:true, allowNull:false, validate: { isEmail: true} },
         password:{type:DataTypes.STRING, allowNull:false},
         role:{type:DataTypes.STRING, defaultValue:'user'},
         img:{type:DataTypes.STRING, allowNull:true},
         name:{type:DataTypes.STRING, allowNull:false},
         lastname:{type:DataTypes.STRING, allowNull:false},
-        phone:{type:DataTypes.STRING, allowNull:false, unique:true},
+        phone:{type:DataTypes.STRING, allowNull:false, unique:true, validate: 
+            {is: /^(?:\+380|380|0)\d{9}$/}
+        },
         delivery_info:{type:DataTypes.STRING, allowNull:true}
     }, {
         hooks: {
@@ -36,8 +38,8 @@ const Product = sequelize.define(
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
         name:{type:DataTypes.STRING, unique:true, allowNull:false},
-        price:{type:DataTypes.INTEGER, allowNull:false},
-        disc_price:{type:DataTypes.INTEGER},
+        price:{type:DataTypes.DECIMAL(10,2), allowNull:false},
+        disc_price:{type:DataTypes.DECIMAL(10,2)},
         img:{type:DataTypes.STRING, allowNull:false},
         description:{type:DataTypes.TEXT, allowNull:false},
         quantity:{type:DataTypes.INTEGER, defaultValue:0},
@@ -102,9 +104,46 @@ const CartItem = sequelize.define(
     'cart_item',
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        quantity:{type:DataTypes.INTEGER}
+        quantity:{type:DataTypes.INTEGER, allowNull:false}
         //product_id
         //cart_id
+    }
+)
+
+const Order = sequelize.define(
+    'order',
+    {
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        status:{type:DataTypes.STRING, defaultValue:"Очікує підтвердження", allowNull:false},
+        total:{type:DataTypes.DECIMAL(10,2), allowNull:false},
+        delivery_method:{type:DataTypes.STRING, allowNull:false},
+        delivery_address:{type:DataTypes.STRING, allowNull:true},
+        payment_method:{type:DataTypes.STRING, allowNull:false},
+        recipient_name:{type:DataTypes.STRING, allowNull:false},
+        recipient_lastname:{type:DataTypes.STRING, allowNull:false},
+        recipient_phone:{type:DataTypes.STRING, allowNull:false, 
+            validate: 
+            {is: /^(?:\+380|380|0)\d{9}$/}
+         },
+        recipient_email:{type:DataTypes.STRING, allowNull:false, validate: { isEmail: true} },
+        comment:{type:DataTypes.STRING, allowNull:true}
+        //user_id
+    }
+)
+
+//Очікує підтвердження
+//Підтвержено
+//Відправлено
+//Доставлено
+//Скасовано
+
+const OrderItem = sequelize.define(
+    'order_item',
+    {
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        quantity:{type:DataTypes.INTEGER, allowNull:false}
+        //product_id
+        //order_id
     }
 )
 
@@ -130,10 +169,16 @@ const ProductFeatures = sequelize.define(
 
 User.hasOne(Cart)
 Cart.belongsTo(User)
+User.hasMany(Order)
+Order.belongsTo(User)
 User.hasMany(Review)
 Review.belongsTo(User)
 Cart.hasMany(CartItem)
 CartItem.belongsTo(Cart)
+Order.hasMany(OrderItem)
+OrderItem.belongsTo(Order)
+Product.hasMany(OrderItem)
+OrderItem.belongsTo(Product)
 Category.hasMany(Product)
 Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
 Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' });
@@ -202,6 +247,8 @@ module.exports = {
     PostAuthor,
     Wishlist,
     Bookmarks,
-    BrandCategory
+    BrandCategory,
+    Order,
+    OrderItem
 }
 

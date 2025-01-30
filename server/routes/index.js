@@ -10,6 +10,7 @@ const wishlist = require('./wishlist')
 const author = require('./author')
 const blog = require('./blog')
 const bookmarks = require('./bookmarks')
+const order = require('./order')
 
 router.use('/user', user)
 router.use('/category', category)
@@ -20,5 +21,6 @@ router.use('/wishlist', wishlist)
 router.use('/author', author)
 router.use('/blog', blog)
 router.use('/bookmarks', bookmarks)
+router.use('/order', order)
 
 module.exports = router
