@@ -24,7 +24,13 @@ class OrderRepository{
         let total = 0
         const products = await Promise.all(cartItems.rows.map(item => Product.findByPk(item.productId)));
         for (let i=0; i<cartItems.rows.length; i++) {
-            total += cartItems.rows[i].quantity * products[i].price
+            if(products[i].disc_price === null){
+                total += cartItems.rows[i].quantity * products[i].price
+            }
+            else{
+                total += cartItems.rows[i].quantity * products[i].disc_price
+            }
+            
         }
 
         //create an order
