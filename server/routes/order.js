@@ -4,11 +4,10 @@ const order_controller = require('../controllers/order_controller')
 const roleControll = require('../middleware/RoleControllMiddleware')
 const AuthorizationMiddleware = require('../middleware/AuthorizationMiddleware')
 
-//router.get('/', AuthorizationMiddleware, order_controller.getOrder)
 router.post('/', AuthorizationMiddleware, order_controller.createOrder)
-// router.delete('/item/:productId', AuthorizationMiddleware, order_controller.deleteProductFromCart)
-// router.put('/incItem', AuthorizationMiddleware, order_controller.increaseCartItem)
-// router.put('/decItem', AuthorizationMiddleware, order_controller.decreaseCartItem)
-// router.delete('/', AuthorizationMiddleware, order_controller.clearCart)
+router.get('/', AuthorizationMiddleware, order_controller.getUserOrders)
+router.patch('/:id/cancel', AuthorizationMiddleware, order_controller.cancelOrder)
+router.patch('/:id/status', roleControll('admin'), order_controller.changeOrderStatus)
+router.get('/all', roleControll('admin'), order_controller.getAllOrders)
 
 module.exports = router

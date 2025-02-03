@@ -1,3 +1,4 @@
+const { model } = require('../database')
 const {Product, Order, OrderItem, CartItem, Cart} = require('../models/models')
 
 class OrderRepository{
@@ -37,6 +38,69 @@ class OrderRepository{
 
         return order
     }
+    async getUserOrders(userId){
+        const orders = await Order.findAll({
+            where: {userId}, 
+            attributes: ['id', 'total', 'createdAt', 'status'], 
+            include: [
+            {
+                model: OrderItem,
+                attributes: ['quantity'],
+                include: [
+                    {
+                        model: Product,
+                        attributes: ['name', 'price','disc_price', 'img']
+                    }
+                ]
+            }],
+            order: [['createdAt', 'DESC']]
+        })
+
+        if(!orders){
+            throw new Error("Ваша історія замовлень поки пуста.")
+        }
+        return orders
+    }
+    async cancelOrder(userId, orderId){
+        const order = await Order.findOne({where:{userId:userId, id:orderId}})
+        if(!order){
+            throw new Error("Замовлення не знайдено")
+        }
+        if (["Відправлено", "Доставлено", "Скасовано"].includes(order.status)) {
+            throw new Error('Скасування замовлення на даному етапі неможливе');
+        }
+        await order.update({ status: "Скасовано" })
+    }
+    async getAllOrders(){
+        const orders = await Order.findAll({
+            attributes: ['id', 'total', 'createdAt', 'status', 'delivery_method', 'delivery_address', 'payment_method', 'recipient_name', 'recipient_lastname', 'recipient_phone', 'recipient_email', 'comment'], 
+            include: [
+            {
+                model: OrderItem,
+                attributes: ['quantity'],
+                include: [
+                    {
+                        model: Product,
+                        attributes: ['name', 'price','disc_price', 'img']
+                    }
+                ]
+            }],
+            order: [['createdAt', 'DESC']]
+        })
+
+        if(!orders){
+            throw new Error("Замовлення не знайдені")
+        }
+        return orders
+    }
+    async changeOrderStatus(orderId, status){
+        const order = await Order.findOne({where:{id:orderId}})
+        if(!order){
+            throw new Error("Замовлення не знайдено")
+        }
+        await order.update({ status: status })
+    }
+
 }
 
 module.exports = new OrderRepository()
