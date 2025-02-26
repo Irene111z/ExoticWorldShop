@@ -1,0 +1,26 @@
+.banner-home{
+    font-family: 'Montserrat';
+}
+.banner-home img {
+    width: 100%;
+    height: auto;
+}
+.banner-home-content{
+    width: 100%;
+}
+/* .banner-home-divider{
+    position: absolute;
+    top: 94%;
+    left: 0;
+} */
+.banner-home-title{
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0px 5px 4px rgba(0,0,0,0.5);
+}
+.banner-home-text{
+    font-size: 20px;
+    font-family: 500;
+    color: white;
+}

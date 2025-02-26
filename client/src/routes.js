@@ -1,4 +1,14 @@
-import { Admin, Wishlist, Bookmarks, HomePage, Auth, Blog, OrderPage, Catalog, PostPage, ProductPage, UserProfile } from './pages';
+import Admin from './pages/Admin';
+import Wishlist from './pages/Wishlist';
+import Bookmarks from './pages/Bookmarks';
+import HomePage from './pages/HomePage';
+import Auth from './pages/Auth';
+import Blog from './pages/Blog';
+import OrderPage from './pages/OrderPage';
+import Catalog from './pages/Catalog';
+import PostPage from './pages/PostPage';
+import ProductPage from './pages/ProductPage';
+import UserProfile from './pages/UserProfile';
 import * as path from '../src/utils/path'
 
 export const authRoutes = [
@@ -12,6 +22,10 @@ export const authRoutes = [
     {
         path: path.BOOKMARKS_ROUTE,
         Component: Bookmarks
+    },
+    {
+        path: path.PROFILE_ROUTE,
+        Component: UserProfile
     }
 ]
 export const publicRoutes = [
@@ -37,8 +51,8 @@ export const publicRoutes = [
         Component: Auth
     },
     {
-        path: path.REGISTRATION_ROUTE,
-        Component: Auth
+        path: path.BLOG_ROUTE,
+        Component: Blog
     },
     {
         path: path.ORDER_ROUTE,

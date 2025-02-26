@@ -1,0 +1,61 @@
+.navbar-logo{
+    width: 70px;
+}
+.header{
+    background-color: transparent;
+    font-size: 16px;
+    font-family: 'Montserrat';
+    width: 100%;
+}
+.navbar-search input[type='text'], .navbar-search button{
+    border: none;
+    background-color: rgb(122, 192, 9);
+    height: 32px;
+}
+.navbar-search input[type='text']{
+    border-radius: 10px 0 0 10px;
+    color: #fff;
+}
+.navbar-search input::placeholder{
+    color: #fff;
+    padding-left: 0.5rem;
+}
+.navbar-search button{
+    border-radius: 0 10px 10px 0;
+}
+
+.navbar-links{
+    color: #fff;
+    text-decoration: none;
+    font-weight: 400;
+}
+.navbar-title{
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+.header-cats{
+    background-color: #fff;
+}
+.header-cat{
+    color: #2E4628;
+    text-decoration: none;
+    font-weight: 600;
+}
+.header-saving-count, .header-cart-count, .header-wishlist-count{
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 50px;
+    text-align: center;
+    width: 25px;
+}
+.header-saving-count{
+    background-color: #6FB312;
+}
+.header-cart-count{
+    background-color: #FF7A00;
+}
+.header-wishlist-count{
+    background-color: #FF006B;
+}

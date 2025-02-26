@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { createContext } from 'react';
 import ReactDOM from 'react-dom/client';
+import './index.css'
 import App from './App';
+import UserContext from './context/UserContext';
+import ProductContext from './context/ProductContext';
+export const Context = createContext(null)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <App />
+    <Context.Provider value={{
+        user: new UserContext(),
+        product: new ProductContext()
+        }}>
+        <App />
+    </Context.Provider>
 );
