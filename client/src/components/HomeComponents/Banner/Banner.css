@@ -1,26 +1,57 @@
-.banner-home{
+.banner-home {
     font-family: 'Montserrat';
+    position: relative;
 }
-.banner-home img {
+
+.banner-home-image-container {
+    position: relative;
+    width: 100%;
+}
+
+.banner-home-image {
     width: 100%;
     height: auto;
 }
-.banner-home-content{
-    width: 100%;
+
+.banner-home-content {
+    color: white;
+    z-index: 2;
 }
-/* .banner-home-divider{
+
+.right-bottom{
     position: absolute;
-    top: 94%;
-    left: 0;
-} */
-.banner-home-title{
+    bottom: 8%;
+    right: 10%;
+}
+.left-top{
+    position: absolute;
+    top: 20%;
+    left: 10%;
+}
+
+.banner-home-title {
     font-size: 32px;
     font-weight: 700;
     color: white;
     text-shadow: 0px 5px 4px rgba(0,0,0,0.5);
 }
-.banner-home-text{
+
+.banner-home-text {
     font-size: 20px;
-    font-family: 500;
+    font-weight: 400;
     color: white;
+}
+
+.banner-home-divider-container {
+    position: absolute;
+    bottom: -0.1%;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.banner-home-divider {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
 }
