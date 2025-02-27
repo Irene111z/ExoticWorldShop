@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className='mt-5'>
         <img src="/static/footer-divider.svg" alt="" style={{width:'100%'}}/>
         <div className="footer py-4">
-            <div className="d-flex flex-column container-fluid container-xxl">
+            <div className="d-flex flex-column container-xxl">
                 <div className="d-flex justify-content-between mb-5 pt-2">
                     <div className="d-flex flex-column text-center">
                         <p className='footer-title'>Інформація</p>
@@ -30,7 +30,7 @@ const Footer = () => {
                         <p className='footer-title'>Контакти</p>
                         <p className='footer-link'>+380688935000</p>
                         <p className='footer-link'>+380688935000</p>
-                        <p className='footer-link'>MyExoticFriend@gmail.com</p>
+                        <p className='footer-link'>ExoWorldSupport@gmail.com</p>
                     </div>
                 </div>
                 <div className="d-flex justify-content-between">
