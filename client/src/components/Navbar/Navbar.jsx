@@ -1,30 +1,21 @@
-import './Navbar.css'
+import './Navbar.css';
 import { Link } from 'react-router-dom';
-import { HOMEPAGE_ROUTE, WISHLIST_ROUTE, PROFILE_ROUTE, BLOG_ROUTE, BOOKMARKS_ROUTE, CATALOG_ROUTE } from '../../utils/path'
-import { useContext, useState } from 'react'
-import { Context } from '../../index'
-import { observer } from 'mobx-react-lite'
+import { HOMEPAGE_ROUTE, WISHLIST_ROUTE, PROFILE_ROUTE, BLOG_ROUTE, BOOKMARKS_ROUTE } from '../../utils/path';
+import { useContext, useState } from 'react';
+import { Context } from '../../index';
+import { observer } from 'mobx-react-lite';
+import AuthForm from '../AuthForm/AuthForm';
 
 const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
-    const [showLoginDropdown, setShowLoginDropdown] = useState(false); // Стейт для дропдауну
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
-    const handleLogin = (event) => {
-        event.preventDefault();
-        const loginData = new FormData(event.target);
-        const username = loginData.get('username');
-        const password = loginData.get('password');
-        
-        // Тут потрібно реалізувати логіку авторизації
-        console.log('Username:', username, 'Password:', password);
-
-        // Після успішної авторизації потрібно оновити статус user.isAuth
-        user.isAuth = true; // Це має бути результатом реальної авторизації
-        setShowLoginDropdown(false); // Закриваємо форму після авторизації
+    const openAuthModal = () => {
+        setShowAuthModal(true);
     };
 
-    const toggleLoginDropdown = () => {
-        setShowLoginDropdown(!showLoginDropdown); // Змінюємо стан на протилежний (відкриваємо/закриваємо)
+    const closeAuthModal = () => {
+        setShowAuthModal(false);
     };
 
     return (
@@ -52,7 +43,7 @@ const Navbar = observer(({ isHomePage }) => {
                             <img src="/static/navbar-profile.svg" alt="" />
                         </Link>
                     ) : (
-                        <div className='me-4' onClick={toggleLoginDropdown}> {/* Тепер при натисканні буде змінюватись стан */}
+                        <div className='me-4' onClick={openAuthModal}>
                             <img src="/static/navbar-profile.svg" alt="" />
                         </div>
                     )}
@@ -63,7 +54,7 @@ const Navbar = observer(({ isHomePage }) => {
                                 <img src="/static/navbar-wishlist.svg" alt="" />
                             </Link>
                         ) : (
-                            <div className='text-center py-0' onClick={toggleLoginDropdown}> {/* Тепер при натисканні буде змінюватись стан */}
+                            <div className='text-center py-0' onClick={openAuthModal}>
                                 <img src="/static/navbar-wishlist.svg" alt="" />
                             </div>
                         )}
@@ -75,7 +66,7 @@ const Navbar = observer(({ isHomePage }) => {
                                 <img src="/static/navbar-saving.svg" alt="" />
                             </Link>
                         ) : (
-                            <div className='text-center py-0' onClick={toggleLoginDropdown}> {/* Тепер при натисканні буде змінюватись стан */}
+                            <div className='text-center py-0' onClick={openAuthModal}>
                                 <img src="/static/navbar-saving.svg" alt="" />
                             </div>
                         )}
@@ -99,22 +90,7 @@ const Navbar = observer(({ isHomePage }) => {
                 <p className='my-0'><Link to='/birds' className='header-cat'>Птахам</Link></p>
             </div>
 
-            {/* Dropdown для авторизації */}
-            {showLoginDropdown && (
-                <div className="login-dropdown">
-                    <form onSubmit={handleLogin} className="login-form">
-                        <div className="form-group">
-                            <label htmlFor="username">Логін</label>
-                            <input type="text" id="username" name="username" required className="form-control" />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="password">Пароль</label>
-                            <input type="password" id="password" name="password" required className="form-control" />
-                        </div>
-                        <button type="submit" className="btn btn-primary">Увійти</button>
-                    </form>
-                </div>
-            )}
+            {showAuthModal && <AuthForm onClose={closeAuthModal} />}
         </header>
     );
 });
