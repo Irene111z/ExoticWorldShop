@@ -1,15 +1,17 @@
 import React from 'react'
 import './ProductCard.css'
-import { Link } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import { PRODUCT_ROUTE } from '../../utils/path'
 
 const ProductCard = ({product}) => {
+  const navigate = useNavigate();
   return (
     <div className="col mb-4 product-card">
       <div className="d-flex flex-column justify-content-between product-card-content">
         <div className="d-flex flex-column">
           <p style={{color:"#858585", fontSize:'12px'}} className='mb-1'>Код: {product.id}</p>
           <div className="d-flex flex-column align-items-center">
-            <Link to={`/product/${product.id}`} onClick={window.scrollTo(0,0)}><img className="d-flex" src={product.img} alt="..."/></Link>
+            <img className="d-flex" src={product.img} alt="..." onClick={() => navigate(`${PRODUCT_ROUTE}/${product.id}`)}/>
             <div className='d-flex product-card-rating d-flex mt-1'>
               <img src='/static/star-filled.svg' alt="" />
               <img src='/static/star-filled.svg' alt="" />
@@ -17,7 +19,7 @@ const ProductCard = ({product}) => {
               <img src='/static/star-filled.svg' alt="" />
               <img src='/static/star-filled.svg' alt="" />
             </div>
-            <Link to={`/product/${product.id}`} className="product-card-name mt-2 mb-0">{product.name}</Link>
+            <p className="product-card-name mt-2 mb-0" onClick={() => navigate(`${PRODUCT_ROUTE}/${product.id}`)}>{product.name}</p>
           </div> 
         </div>
         <div className="d-flex flex-row justify-content-between">

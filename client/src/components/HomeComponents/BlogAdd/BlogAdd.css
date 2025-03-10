@@ -28,13 +28,13 @@
     z-index: 2;
     pointer-events: auto;
 }
-.blog-col:hover .block3 .blog-block-img{
+.blog-col .block3 .blog-block-img{
     animation: turtle-animation 1s infinite;
 }
-.blog-col:hover .block2 .blog-block-img-overlay{
+.blog-col .block2 .blog-block-img-overlay{
     animation: hedgehog-animation 1s infinite;
 }
-.blog-col:hover .block1 .blog-block-img-overlay{
+.blog-col .block1 .blog-block-img-overlay{
     animation: raccoon-animation 1s infinite;
 }
 @keyframes turtle-animation {
@@ -44,7 +44,7 @@
 }
 @keyframes hedgehog-animation {
     50% {
-        transform: scale(1.04);
+        transform: scale(1.02);
     }
 }
 @keyframes raccoon-animation {

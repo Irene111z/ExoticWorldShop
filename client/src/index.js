@@ -4,6 +4,8 @@ import './index.css'
 import App from './App';
 import UserContext from './context/UserContext';
 import ProductContext from './context/ProductContext';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 export const Context = createContext(null)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

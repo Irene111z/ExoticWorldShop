@@ -1,5 +1,5 @@
 body{
-    background-color: #546C42;
+    background-color: #546C42 !important;
 }
 .app-container {
     display: flex;
