@@ -2,13 +2,18 @@ import {makeAutoObservable} from 'mobx'
 
 export default class UserContext{
     constructor(){
-        this._isAuth = false
+        this._isAuth = true
+        this._isAdmin = false
         this._user = {}
         makeAutoObservable(this)
     }
 
-    setIsAuth(auth){
-        this._isAuth = auth
+    setIsAuth(isAuth){
+        this._isAuth = isAuth
+    }
+
+    setIsAdmin(isAdmin){
+        this._isAdmin = isAdmin
     }
 
     setUser(user){

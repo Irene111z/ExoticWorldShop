@@ -7,12 +7,12 @@ import AuthForm from '../../AuthForm/AuthForm';
 
 const Product = observer(() => {
     const { product } = useContext(Context)
-        const prod = {
+    const prod = {
         id: 1,
         name: 'корм для пацючків',
         description: 'слалваллмлавп',
         new_price: 700,
-        old_price:1000,
+        old_price: 1000,
         quantity: 5,
         brandId: 1,
         categoryId: 1,
@@ -23,13 +23,23 @@ const Product = observer(() => {
             "https://i.pinimg.com/736x/83/a0/54/83a054b7377bacc0614845290029cce4.jpg"
         ]
     };
+    const product_features = [
+        { id: 1, name: 'Бренд', description: 'Ferplast' },
+        { id: 2, name: 'Висота', description: '80 см' },
+        { id: 3, name: 'Ширина', description: '70 см' },
+        { id: 4, name: 'Довжина', description: '120 см' },
+        { id: 5, name: 'Колір', description: 'сірий' },
+    ]
     const [activeImage, setActiveImage] = useState(prod.img[0]);
+
     const similar = product.products.filter((e) => e.categoryId === prod.categoryId && e.id !== prod.id)
+
     const { user } = useContext(Context);
+
     const [showAuthModal, setShowAuthModal] = useState(false);
+
     const [reviewText, setReviewText] = useState('');
     const [rating, setRating] = useState(0);
-
     const handleReviewSubmit = () => {
         if (!reviewText.trim()) return;
         console.log('Відгук:', { rating, text: reviewText });
@@ -48,7 +58,7 @@ const Product = observer(() => {
     return (
         <div className='d-flex flex-column mt-5'>
             <div className="row">
-            <div className="col-4 offset-1 product-slider flex-column">
+                <div className="col-4 offset-1 product-slider flex-column">
                     <div className="active mb-3">
                         <img src={activeImage} alt="" className='' />
                         <div className="product-sale">
@@ -57,12 +67,12 @@ const Product = observer(() => {
                     </div>
                     <div className="controls d-flex justify-content-between">
                         {prod.img.map((image, index) => (
-                            <img 
-                                key={index} 
-                                src={image} 
-                                alt="" 
-                                className={activeImage === image ? 'selected' : ''} 
-                                onClick={() => setActiveImage(image)} 
+                            <img
+                                key={index}
+                                src={image}
+                                alt=""
+                                className={activeImage === image ? 'selected' : ''}
+                                onClick={() => setActiveImage(image)}
                             />
                         ))}
                     </div>
@@ -139,12 +149,11 @@ const Product = observer(() => {
                     <div className="tab-content" id="myTabContent">
                         <div className="tab-pane fade show active" id="features" role="tabpanel" aria-labelledby="features-tab">
                             <div className="d-flex flex-column mt-4 mb-3">
-                                <p className='features-title mb-2'>Бренд: <span style={{ fontWeight: '400', color:"#858585"}}>Ferplast</span></p>
-                                <p className='features-title mb-2'>Висота: <span style={{ fontWeight: '400', color:"#858585"}}>120 см</span></p>
-                                <p className='features-title mb-2'>Ширина: <span style={{ fontWeight: '400', color:"#858585"}}>56 см</span></p>
-                                <p className='features-title mb-2'>Довжина: <span style={{ fontWeight: '400', color:"#858585"}}>90 см</span></p>
-                                <p className='features-title mb-2'>Призначення: <span style={{ fontWeight: '400', color:"#858585"}}>для гризунів</span></p>
-                                <p className='features-title mb-2'>Колір: <span style={{ fontWeight: '400', color:"#858585"}}>сірий</span></p>
+                                {product_features.map((feature) => (
+                                    <p key={feature.id} className='features-title mb-2'>
+                                        {feature.name}: <span style={{ fontWeight: '400', color: "#858585" }}>{feature.description}</span>
+                                    </p>
+                                ))}
                             </div>
                         </div>
                         <div className="tab-pane fade" id="description" role="tabpanel" aria-labelledby="description-tab">
@@ -222,7 +231,7 @@ const Product = observer(() => {
                                 </div>
                                 <div className="row row-cols-1 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-2 row-cols-md-2 g-4">
                                     {similar.map((product) => {
-                                        return <ProductCard key={product.id} product={product}/>
+                                        return <ProductCard key={product.id} product={product} />
                                     })}
                                 </div>
                             </div>
