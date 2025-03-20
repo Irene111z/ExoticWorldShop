@@ -1,28 +1,70 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { Context } from '../../../index'
 import { observer } from 'mobx-react-lite'
 import './Product.css'
 import ProductCard from '../../ProductCard/ProductCard'
+import AuthForm from '../../AuthForm/AuthForm';
 
 const Product = observer(() => {
     const { product } = useContext(Context)
-    const prod = {id:1, name:'корм для пацючків', description: 'слалваллмлавп', price:700, quantity:5, brandId:1, categoryId:1, img:"https://i.pinimg.com/736x/59/33/75/593375c87ad6e1381d1f4817b1cfa687.jpg"}
+        const prod = {
+        id: 1,
+        name: 'корм для пацючків',
+        description: 'слалваллмлавп',
+        new_price: 700,
+        old_price:1000,
+        quantity: 5,
+        brandId: 1,
+        categoryId: 1,
+        img: [
+            "https://i.pinimg.com/736x/59/33/75/593375c87ad6e1381d1f4817b1cfa687.jpg",
+            "https://i.pinimg.com/736x/c1/a0/46/c1a046b58414e1ada466e3d188587225.jpg",
+            "https://i.pinimg.com/736x/a5/2a/c8/a52ac8b35a7b033f58db9286aafc6254.jpg",
+            "https://i.pinimg.com/736x/83/a0/54/83a054b7377bacc0614845290029cce4.jpg"
+        ]
+    };
+    const [activeImage, setActiveImage] = useState(prod.img[0]);
     const similar = product.products.filter((e) => e.categoryId === prod.categoryId && e.id !== prod.id)
+    const { user } = useContext(Context);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [reviewText, setReviewText] = useState('');
+    const [rating, setRating] = useState(0);
+
+    const handleReviewSubmit = () => {
+        if (!reviewText.trim()) return;
+        console.log('Відгук:', { rating, text: reviewText });
+        setReviewText('');
+        setRating(0);
+    };
+
+    const openAuthModal = () => {
+        setShowAuthModal(true);
+    };
+
+    const closeAuthModal = () => {
+        setShowAuthModal(false);
+    };
+
     return (
         <div className='d-flex flex-column mt-5'>
             <div className="row">
-                <div className="col-4 offset-1 product-slider flex-column">
-                    <div className="active">
-                        <img src={prod.img} alt="" className='' />
+            <div className="col-4 offset-1 product-slider flex-column">
+                    <div className="active mb-3">
+                        <img src={activeImage} alt="" className='' />
                         <div className="product-sale">
                             -{(((prod.old_price - prod.new_price) / prod.old_price) * 100).toFixed(0)}%
                         </div>
                     </div>
                     <div className="controls d-flex justify-content-between">
-                        <img src={prod.img} alt="" />
-                        <img src={prod.img} alt="" />
-                        <img src={prod.img} alt="" />
-                        <img src={prod.img} alt="" />
+                        {prod.img.map((image, index) => (
+                            <img 
+                                key={index} 
+                                src={image} 
+                                alt="" 
+                                className={activeImage === image ? 'selected' : ''} 
+                                onClick={() => setActiveImage(image)} 
+                            />
+                        ))}
                     </div>
                 </div>
                 <div className="col-5 offset-1 d-flex flex-column product-base-info">
@@ -117,9 +159,37 @@ const Product = observer(() => {
                         </div>
                         <div className="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                             <div className="d-flex flex-column">
-                                <button className='btn-add-review mt-3'>
-                                    Залишити відгук
-                                </button>
+                                {user.isAuth ? (
+                                    <div className="review-form mt-3">
+                                        <p className="mb-2">Ваш відгук:</p>
+                                        <div className="d-flex mb-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <img
+                                                    key={star}
+                                                    src={star <= rating ? '/static/star-filled.svg' : '/static/star-empty.svg'}
+                                                    alt=""
+                                                    onClick={() => setRating(star)}
+                                                    style={{ cursor: 'pointer', width: '24px', marginRight: '5px' }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <textarea
+                                            className="form-control textarea-review mb-2"
+                                            rows="3"
+                                            placeholder="Опишіть ваші враження про продукт."
+                                            value={reviewText}
+                                            onChange={(e) => setReviewText(e.target.value)}
+                                        />
+                                        <button className="btn-add-review" onClick={handleReviewSubmit}>
+                                            Надіслати відгук
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="">
+                                        Щоб залишити відгук <span onClick={openAuthModal} className='auth-link'>увійдіть в акаунт</span>.
+                                    </div>
+                                )}
+                                {showAuthModal && <AuthForm onClose={closeAuthModal} />}
                                 <div className="d-flex flex-column mt-4">
                                     <hr className='mt-0' />
                                     <div className="d-flex justify-content-between">
