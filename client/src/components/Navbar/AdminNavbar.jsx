@@ -5,7 +5,7 @@ import { ORDERS_MANAGEMENT_ROUTE, CATEGORIES_MANAGEMENT_ROUTE, PRODUCTS_MANAGEME
 
 const AdminNavbar = () => {
   return (
-    <div className='admin-navbar fixed-top'>
+    <div className='admin-navbar'>
         <nav className='d-flex container-xxl d-flex justify-content-between py-4'>
             <div className='d-flex admin-navbar-link'>
                 <NavLink to={ORDERS_MANAGEMENT_ROUTE} className={({ isActive }) => isActive ? 'me-5 admin-link-active' : 'me-5'}>Замовлення</NavLink>
