@@ -1,4 +1,7 @@
-import Admin from './pages/Admin';
+import OrdersManagement from './pages/OrdersManagement'
+import ProductsManagement from './pages/ProductsManagement'
+import PostsManagement from './pages/PostsManagement'
+import CategoriesManagement from './pages/CategoriesManagement'
 import Wishlist from './pages/Wishlist';
 import Bookmarks from './pages/Bookmarks';
 import HomePage from './pages/HomePage';
@@ -12,8 +15,17 @@ import UserProfile from './pages/UserProfile';
 import * as path from '../src/utils/path'
 
 export const authRoutes = [
-    {   path: path.ADMIN_ROUTE,
-        Component: Admin
+    {   path: path.ORDERS_MANAGEMENT_ROUTE,
+        Component: OrdersManagement
+    },
+    {   path: path.PRODUCTS_MANAGEMENT_ROUTE,
+        Component: ProductsManagement
+    },
+    {   path: path.CATEGORIES_MANAGEMENT_ROUTE,
+        Component: CategoriesManagement
+    },
+    {   path: path.POSTS_MANAGEMENT_ROUTE,
+        Component: PostsManagement
     },
     {
         path: path.WISHLIST_ROUTE,

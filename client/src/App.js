@@ -3,20 +3,23 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import './index.css'
 import AppRouter from './components/AppRouter';
 import Navbar from './components/Navbar/Navbar';
+import AdminNavbar from './components/Navbar/AdminNavbar';
 import Footer from './components/Footer/Footer';
 
 function Layout() {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const isAdminPage = location.pathname.startsWith("/admin");
 
   return (
+
     <>
-      <div className="app-container">
-        <Navbar isHomePage={isHomePage} />
+      <div className={`app-container ${isAdminPage ? 'admin-background' : ''}`}>
+        {isAdminPage ? <AdminNavbar /> : <Navbar isHomePage={isHomePage} />}
         <div className="main-content">
           <AppRouter />
         </div>
-        <Footer />
+        {!isAdminPage && <Footer />}
       </div>
     </>
   );

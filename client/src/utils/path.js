@@ -1,4 +1,7 @@
-export const ADMIN_ROUTE = '/admin'
+export const ORDERS_MANAGEMENT_ROUTE = '/admin/orders'
+export const PRODUCTS_MANAGEMENT_ROUTE = '/admin/products'
+export const CATEGORIES_MANAGEMENT_ROUTE = '/admin/categories'
+export const POSTS_MANAGEMENT_ROUTE = '/admin/posts'
 
 export const LOGIN_ROUTE = '/login'
 export const REGISTRATION_ROUTE = '/registration'

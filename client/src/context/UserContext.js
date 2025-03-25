@@ -3,7 +3,7 @@ import {makeAutoObservable} from 'mobx'
 export default class UserContext{
     constructor(){
         this._isAuth = true
-        this._isAdmin = false
+        this._isAdmin = true
         this._user = {}
         makeAutoObservable(this)
     }
@@ -22,6 +22,10 @@ export default class UserContext{
 
     get isAuth(){
         return this._isAuth
+    }
+
+    get isAdmin(){
+        return this._isAdmin
     }
 
     get user(){

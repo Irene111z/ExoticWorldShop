@@ -2,18 +2,34 @@ import './AuthForm.css';
 import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ORDERS_MANAGEMENT_ROUTE } from '../../utils/path';
 
 const AuthForm = observer(({ onClose }) => {
 
     const [loginForm, setLoginForm] = useState(true);
     const [passwordShown, setPasswordShown] = useState(false);
     const { user } = useContext(Context);
+    const navigate = useNavigate();
 
     const toggleForm = () => {
         setLoginForm(!loginForm);
     };
     const togglePassword = () => {
         setPasswordShown(!passwordShown);
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        user.setIsAuth(true);
+        onClose();
+
+        const redirectUrl = localStorage.getItem('redirectUrl') || '/';
+        if (user.isAdmin) {
+            navigate(ORDERS_MANAGEMENT_ROUTE);
+        } else {
+            navigate(redirectUrl);
+        }
+        localStorage.removeItem('redirectUrl');
     };
 
     return (
@@ -26,7 +42,7 @@ const AuthForm = observer(({ onClose }) => {
                 <div className={`auth-box ${loginForm ? 'login-active' : 'register-active'}`}>
                     <div className="moving-block"></div>
                     <div className="auth-panel auth-left" style={{ opacity: loginForm ? 1 : 0, visibility: loginForm ? "visible" : "hidden" }}>
-                        <form className="auth-form">
+                        <form className="auth-form" onSubmit={handleSubmit}>
                             <h2 className='auth-form-title'>Вхід</h2>
                             <input type="email" className="auth-form-input" placeholder="Email" />
                             <div className="password-container d-flex justify-content-between">
@@ -35,7 +51,7 @@ const AuthForm = observer(({ onClose }) => {
                                     <img src={passwordShown ? "/static/show-password-monkey.svg" : "/static/hide-password-monkey.svg"}/>
                                 </button>
                             </div>
-                            <button type="submit" className='btn-submit' onClick={()=>user.setIsAuth(true)}>Увійти</button>
+                            <button type="submit" className='btn-submit'>Увійти</button>
                             <div className="d-flex flex-row mt-2 align-self-center">
                                 <p className='m-0 p-0 me-3'>Ще не зареєстровані?</p>
                                 <p className="m-0 p-0 form-switch" onClick={toggleForm}>Реєстрація</p>

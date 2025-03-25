@@ -10,3 +10,6 @@ body{
 .main-content {
     flex-grow: 1;
 }
+.admin-background {
+    background-color: #FFFFFF;
+  }
