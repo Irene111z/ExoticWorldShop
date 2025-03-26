@@ -1,5 +1,5 @@
 .order-card{
-    background-color: #EEF3E9;
+    background-color: #F6FBF1;
     font-size: 16px;
     font-weight: 400;
     color: #000000;
@@ -35,4 +35,6 @@
 .order-card:not(.collapsed) .order-card-toggle {
     transform: rotate(180deg);
 }
-  
+.order-card-products{
+    background-color: #F6FBF1;
+}

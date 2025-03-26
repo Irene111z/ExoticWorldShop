@@ -22,7 +22,9 @@ const OrdersManagement = observer(() => {
           </select>
         </div>
       </div>
-        <OrderCard/>
+      {Array.from({ length: 5 }, (_, index) => (
+        <OrderCard key={index} id={index}/>
+      ))}
     </div>
   )
 })
