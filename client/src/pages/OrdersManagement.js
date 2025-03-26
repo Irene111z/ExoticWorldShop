@@ -8,7 +8,7 @@ import './OrdersManagement.css'
 const OrdersManagement = observer(() => {
   const orders = useContext(OrderContext);
   return (
-    <div className='container-fluid container-xxl'>
+    <div className='container-fluid container-xxl order-page'>
       <p className='order-list-title mt-3'>Замовлення</p>
       <div className="d-flex justify-content-between mb-4">
         <input type="text" className='search-order-by-phone' placeholder='Пошук за номером тел.' />

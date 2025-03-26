@@ -1,7 +1,8 @@
 .order-card{
     background-color: #F6FBF1;
-    font-size: 16px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Montserrat';
     color: #000000;
     border: none;
 }
@@ -9,11 +10,11 @@
     color: #5F6368;
     font-weight: 400;
 }
-.order-card-medium{
-    font-weight: 500;
+.order-card-semibold{
+    font-weight: 600;
 }
 .order-card-item-img{
-    max-width: 70px;
+    max-width: 60px;
 }
 .order-card-items {
     width: 100%;
@@ -25,8 +26,8 @@
     display: none;
 }
 .order-card-toggle {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     background-image: var(--bs-accordion-btn-icon);
     background-repeat: no-repeat;
     background-size: contain;
@@ -34,7 +35,4 @@
 }
 .order-card:not(.collapsed) .order-card-toggle {
     transform: rotate(180deg);
-}
-.order-card-products{
-    background-color: #F6FBF1;
 }

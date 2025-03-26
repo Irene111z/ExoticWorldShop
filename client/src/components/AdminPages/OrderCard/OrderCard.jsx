@@ -6,14 +6,14 @@ const OrderCard = ({ id }) => {
     const headingId = `flush-heading-${id}`;
     const collapseId = `flush-collapse-${id}`;
     return (
-        <div class="accordion accordion-flush my-3" id={accordionId}>
+        <div class="accordion accordion-flush my-2" id={accordionId}>
             <div class="accordion-item">
                 <h2 class="accordion-header" id={headingId}>
                     <button class="order-card collapsed w-100 p-3" type="button" data-bs-toggle="collapse" data-bs-target={`#${collapseId}`} aria-expanded="false" aria-controls={collapseId}>
                         <div className="d-flex flex-column w-100">
                             <div className="d-flex justify-content-between">
-                                <p className=' mb-2'>№19394</p>
-                                <p className='order-card-medium  mb-2'>очікує підтвердження</p>
+                                <p className='order-card-semibold mb-2'>№19394</p>
+                                <p className='order-card-semibold mb-2'>очікує підтвердження</p>
                             </div>
                             <div className="d-flex justify-content-between">
                                 <div className="d-flex flex-column align-items-start">
@@ -30,7 +30,7 @@ const OrderCard = ({ id }) => {
                                             <p>14:28</p>
                                         </div>
                                     </div>
-                                    <div className="order-card-toggle mt-2"></div>
+                                    <div className="order-card-toggle"></div>
                                 </div>
                             </div>
                         </div>
@@ -39,7 +39,7 @@ const OrderCard = ({ id }) => {
                 </h2>
                 <div id={collapseId} class="accordion-collapse collapse" aria-labelledby={headingId} data-bs-parent={`#${accordionId}`}>
                     <hr className='m-0'/>
-                    <div class="accordion-body order-card-products">
+                    <div class="accordion-body order-card">
                         <table className='order-card-items'>
                             <tbody>
                                 <tr>
@@ -80,7 +80,7 @@ const OrderCard = ({ id }) => {
                                 </tr>
                             </tbody>
                         </table>
-                        <p className='mb-0 text-end order-card-medium'>Сума до сплати: 6200 грн.</p>
+                        <p className='mb-0 text-end order-card-semibold'>Сума до сплати: 6200 грн.</p>
                     </div>
                 </div>
             </div>

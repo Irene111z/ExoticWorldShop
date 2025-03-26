@@ -1,6 +1,9 @@
 body{
     background-color: #546C42 !important;
 }
+*{
+    font-family: 'Montserrat';
+}
 .app-container {
     display: flex;
     flex-direction: column;
