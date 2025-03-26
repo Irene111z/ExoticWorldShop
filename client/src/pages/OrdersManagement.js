@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import OrderContext from '../context/OrderContext';
 import OrderCard from '../components/AdminPages/OrderCard/OrderCard';
 import './OrdersManagement.css'
+import InputMask from "react-input-mask";
 
 const OrdersManagement = observer(() => {
   const orders = useContext(OrderContext);
@@ -11,7 +12,11 @@ const OrdersManagement = observer(() => {
     <div className='container-fluid container-xxl order-page'>
       <p className='order-list-title mt-3'>Замовлення</p>
       <div className="d-flex justify-content-between mb-4">
-        <input type="text" className='search-order-by-phone' placeholder='Пошук за номером тел.' />
+        <InputMask
+              mask="+38 099-999-99-99"
+              className="search-order-by-phone"
+              placeholder="+38 0XX-XXX-XX-XX"
+        />
         <div className="d-flex">
           <select name="" id="" className='order-filter-select'>
             <option value="value1" selected>Очікує підтвердження</option>
