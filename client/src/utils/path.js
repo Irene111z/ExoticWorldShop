@@ -1,5 +1,7 @@
 export const ORDERS_MANAGEMENT_ROUTE = '/admin/orders'
 export const PRODUCTS_MANAGEMENT_ROUTE = '/admin/products'
+export const CREATE_PRODUCT_ROUTE = '/admin/products/create'
+export const EDIT_PRODUCT_ROUTE = '/admin/products/edit'
 export const CATEGORIES_MANAGEMENT_ROUTE = '/admin/categories'
 export const POSTS_MANAGEMENT_ROUTE = '/admin/posts'
 

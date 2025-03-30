@@ -1,20 +1,19 @@
 import React from "react";
-import CategoryList from "../components/AdminPages/Categories/CategoryList";
-import categoryStore from "../context/CategoryContext";
+import CategoryList from "../../components/AdminPages/Categories/CategoryList";
+import categoryStore from "../../context/CategoryContext";
 import { observer } from "mobx-react-lite";
-import "./CategoriesManagement.css";
+import './CategoriesManagement.css'
 
-// Функція для отримання повного шляху категорії
 const getCategoryPath = (category, categories) => {
   const path = [];
   let current = category;
 
   while (current) {
-    path.unshift(current.name); // Додаємо назву на початок
-    current = categories.find((c) => c.id === current.parentId); // Шукаємо батьківську категорію
+    path.unshift(current.name);
+    current = categories.find((c) => c.id === current.parentId);
   }
 
-  return path.join(" > "); // Формуємо рядок "Гризуни > Аксесуари > Гамаки"
+  return path.join(" > ");
 };
 
 const CategoriesManagement = observer(() => {
@@ -28,7 +27,6 @@ const CategoriesManagement = observer(() => {
           <CategoryList />
         </div>
         <div className="d-flex flex-column mt-3">
-          {/* Додавання категорії */}
           <form className="d-flex flex-column mb-5">
             <p className="category-form-title">Додати категорію</p>
             <input type="text" placeholder="Назва категорії" className="mb-2 category-input" />
@@ -43,7 +41,6 @@ const CategoriesManagement = observer(() => {
             <button className="btn-category-create">Додати категорію</button>
           </form>
 
-          {/* Зміна назви категорії */}
           <form className="d-flex flex-column mb-5">
             <p className="category-form-title">Змінити назву категорії</p>
             <select className="mb-2 category-input">
@@ -58,7 +55,6 @@ const CategoriesManagement = observer(() => {
             <button className="btn-category-change">Застосувати зміни</button>
           </form>
 
-          {/* Видалення категорії */}
           <form className="d-flex flex-column">
             <p className="category-form-title">Видалити категорію</p>
             <select className="mb-2 category-input">

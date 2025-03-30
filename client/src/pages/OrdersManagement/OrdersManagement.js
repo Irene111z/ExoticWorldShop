@@ -1,8 +1,8 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useContext } from 'react';
-import OrderContext from '../context/OrderContext';
-import OrderCard from '../components/AdminPages/OrderCard/OrderCard';
+import OrderContext from '../../context/OrderContext';
+import OrderCard from '../../components/AdminPages/OrderCard/OrderCard';
 import './OrdersManagement.css'
 import InputMask from "react-input-mask";
 

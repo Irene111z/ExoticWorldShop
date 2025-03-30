@@ -1,7 +1,9 @@
-import OrdersManagement from './pages/OrdersManagement'
-import ProductsManagement from './pages/ProductsManagement'
-import PostsManagement from './pages/PostsManagement'
-import CategoriesManagement from './pages/CategoriesManagement'
+import OrdersManagement from './pages/OrdersManagement/OrdersManagement'
+import ProductsManagement from './pages/ProductsManagement/ProductsManagement'
+import CreateProduct from './pages/ProductsManagement/CreateProduct'
+import EditProduct from './pages/ProductsManagement/EditProduct'
+import PostsManagement from './pages/PostsManagement/PostsManagement'
+import CategoriesManagement from './pages/CategoriesManagement/CategoriesManagement'
 import Wishlist from './pages/Wishlist';
 import Bookmarks from './pages/Bookmarks';
 import HomePage from './pages/HomePage';
@@ -20,6 +22,12 @@ export const authRoutes = [
     },
     {   path: path.PRODUCTS_MANAGEMENT_ROUTE,
         Component: ProductsManagement
+    },
+    {   path: path.EDIT_PRODUCT_ROUTE + '/:id',
+        Component: EditProduct
+    },
+    {   path: path.CREATE_PRODUCT_ROUTE,
+        Component: CreateProduct
     },
     {   path: path.CATEGORIES_MANAGEMENT_ROUTE,
         Component: CategoriesManagement

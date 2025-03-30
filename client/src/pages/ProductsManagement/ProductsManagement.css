@@ -1,0 +1,56 @@
+.admin-products-title{
+    font-size: 20px;
+    font-weight: 600;
+}
+.search-product-admin{
+    border: solid #000 1px;
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 5px 15px;
+    width: 400px;
+}
+.add-product-link{
+    color: #fff;
+    font-weight: 500;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 0;
+    width: 200px;
+    background-color: #6FB312;
+}
+.btn-save-product-changes{
+    color: #fff;
+    font-weight: 500;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 15px;
+    background-color: #FF7A00;
+    width: 320px;
+}
+.edit-product-form label{
+    color: #5F6368;
+    margin-bottom: 0.25rem;
+}
+.edit-product-form input, .edit-product-form textarea, .edit-product-feature{
+    max-width: 900px;
+    border: solid #000 1px;
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 5px 15px;
+}
+.edit-product-feature{
+    width: max-content;
+}
+.edit-product-feature input, .edit-product-feature select{
+    border: none;
+    padding: 0;
+    border-radius: 0;
+}
+.edit-product-price{
+    width: 103px;
+}
+.edit-product-quantity{
+    width: 100px;
+}
