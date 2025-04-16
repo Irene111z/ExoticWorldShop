@@ -117,6 +117,12 @@ const EditProduct = observer(() => {
                             <img src="/static/delete-icon.svg" alt="" className='m-0' />
                         </div>
                     ))}
+                    <label>Додати характеристику</label>
+                    <div className="d-flex mb-2">
+                        <input type="text" placeholder='Характеристика' className='me-4'/>
+                        <input type="text" placeholder='Значення'/>
+                    </div>
+                    <button className='add-product-feature-btn'>Додати характеристику</button>
                 </div>
 
                 <div className="d-flex flex-column mb-2 ">

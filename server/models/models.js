@@ -40,10 +40,18 @@ const Product = sequelize.define(
         name:{type:DataTypes.STRING, unique:true, allowNull:false},
         price:{type:DataTypes.DECIMAL(10,2), allowNull:false},
         disc_price:{type:DataTypes.DECIMAL(10,2)},
-        img:{type:DataTypes.STRING, allowNull:false},
+        // img:{type:DataTypes.STRING, allowNull:false},
         description:{type:DataTypes.TEXT, allowNull:false},
         quantity:{type:DataTypes.INTEGER, defaultValue:0},
         //category
+    }
+)
+const ProductImage = sequelize.define(
+    'product_image',
+    {
+        id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
+        img:{type:DataTypes.STRING, allowNull:false},
+        isPreview:{type:DataTypes.BOOLEAN, defaultValue:false}
     }
 )
 const Post = sequelize.define(
@@ -179,6 +187,8 @@ Order.hasMany(OrderItem)
 OrderItem.belongsTo(Order)
 Product.hasMany(OrderItem)
 OrderItem.belongsTo(Product)
+Product.hasMany(ProductImage)
+ProductImage.belongsTo(Product)
 Category.hasMany(Product)
 Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
 Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' });
