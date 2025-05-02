@@ -32,13 +32,14 @@ class UserService{
     async getAllUsers(){
         return await user_repository.getAllUsers()
     }
-    async changeUserProfile(id, data, files){
-        const user = await user_repository.getUserById(id)
-        if(!user){
-            throw new Error(`Користувача не існує`)
+    async changeUserProfile(id, data, files) {
+        const user = await user_repository.getUserById(id);
+        if (!user) {
+            throw new Error(`Користувача не існує`);
         }
-        const { img } = files;
-        if (img) {
+    
+        if (files && files.img) { 
+            const { img } = files;
             if (img.mimetype.startsWith('image')) {
                 const fileName = uuid.v4() + ".jpg";
                 const uploadPath = path.resolve(__dirname, '..', 'static', fileName);
@@ -53,7 +54,9 @@ class UserService{
                 throw new Error('Файл не є зображенням');
             }
         }
-        return await user_repository.updateUserProfile(id, data)
+    
+        return await user_repository.updateUserProfile(id, data);
     }
+    
 }
 module.exports = new UserService()

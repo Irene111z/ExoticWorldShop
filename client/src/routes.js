@@ -13,7 +13,7 @@ import OrderPage from './pages/OrderPage';
 import Catalog from './pages/Catalog';
 import PostPage from './pages/PostPage';
 import ProductPage from './pages/ProductPage';
-import UserProfile from './pages/UserProfile';
+import UserProfile from './pages/UserProfile/UserProfile';
 import * as path from '../src/utils/path'
 
 export const authRoutes = [

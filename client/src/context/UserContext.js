@@ -7,7 +7,7 @@ export default class UserContext{
         this._user = {}
         makeAutoObservable(this)
     }
-
+    
     setIsAuth(isAuth){
         this._isAuth = isAuth
     }

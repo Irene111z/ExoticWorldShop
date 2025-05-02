@@ -1,5 +1,6 @@
 const ApiError = require('../errors/ApiError')
 const user_service = require('../services/user_service')
+const { createJWT } = require('../utils/jwt')
 
 class UserController{
     async registration(req, res, next){
@@ -19,7 +20,7 @@ class UserController{
         }
         
     }
-    async auth(req, res, next){
+    async check_token(req, res, next){
         try {
             const jwt_token = createJWT(req.user.id, req.user.email, req.user.role)
             res.json({jwt_token})

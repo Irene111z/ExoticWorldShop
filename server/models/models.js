@@ -246,6 +246,7 @@ Category.belongsToMany(Brand, { through: BrandCategory});
 module.exports = {
     User,
     Product,
+    ProductImage,
     Cart,
     CartItem,
     Category,
