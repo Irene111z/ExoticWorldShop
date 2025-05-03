@@ -21,3 +21,13 @@
     color: #ffffff;
     width: 100%;
 }
+.edit-user-profile-icon{
+    max-width: 30px;
+}
+.logout-user-btn{
+    border-radius: 7px;
+    border: none;
+    background-color: #FF003C;
+    color: #ffffff;
+    width: 100%;
+}

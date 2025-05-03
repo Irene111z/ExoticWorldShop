@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState} from "react";
 import './UserInfoForm.css';
 
 const UserInfoForm = ({ formData, onChange, onSubmit }) => {
+
     const [tempImage, setTempImage] = useState(null); // Стан для тимчасового зображення
     const fileInputRef = useRef(null);
 

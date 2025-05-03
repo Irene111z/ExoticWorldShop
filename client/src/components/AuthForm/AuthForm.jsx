@@ -24,16 +24,20 @@ const AuthForm = observer(({ onClose }) => {
     const togglePassword = () => {
         setPasswordShown(!passwordShown);
     };
-    
+
+    const avatarList = ['non-avatar1.jpg', 'non-avatar2.jpg', 'non-avatar3.jpg'];
+    const getRandomAvatar = () => avatarList[Math.floor(Math.random() * avatarList.length)];
+
     const signIn = async(e) => {
         e.preventDefault();
-        let data;
-        data = await registration(email, password, name, lastname, phone)
+        const img = getRandomAvatar()
+        let data
+        data = await registration(email, password, name, lastname, phone, img)
         user.setUser(user)
         user.setIsAuth(true)
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
-        navigate(data.isAdmin ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
+        navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
         localStorage.removeItem('redirectUrl');
     }
     const logIn = async(e) => {
@@ -44,7 +48,7 @@ const AuthForm = observer(({ onClose }) => {
         user.setIsAuth(true)
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
-        navigate(data.isAdmin ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
+        navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
         localStorage.removeItem('redirectUrl');
     }
 
