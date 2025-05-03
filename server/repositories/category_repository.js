@@ -7,6 +7,9 @@ class CategoryRepository{
     async getCategoryById(id){
         return await Category.findByPk(id)
     }
+    async getAllCategories() {
+        return await Category.findAll();
+    }
     async getSubcategoriesByParentId(parentId){
         return await Category.findAll({ where: { parentId } });
     }

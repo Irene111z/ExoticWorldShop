@@ -84,8 +84,8 @@ const CategoryAccordion = ({ category }) => {
   );
 };
 
-const CategoryList = observer(() => {
-  const categoryTree = buildCategoryTree(categoryStore.categories);
+const CategoryList = observer(({ categories }) =>{
+  const categoryTree = buildCategoryTree(categories);
 
   return (
     <ThemeProvider theme={theme}>
