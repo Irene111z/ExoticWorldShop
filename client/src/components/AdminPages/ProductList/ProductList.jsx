@@ -1,15 +1,38 @@
-import React from 'react'
-import './ProductList.css'
-import { useContext } from 'react'
-import { Context } from '../../../index'
-import { observer } from 'mobx-react-lite'
-import { useNavigate } from "react-router-dom"
-import { EDIT_PRODUCT_ROUTE } from '../../../utils/path'
-import './ProductList.css'
+import React, { useEffect, useState } from 'react';
+import './ProductList.css';
+import { useNavigate } from "react-router-dom";
+import { EDIT_PRODUCT_ROUTE } from '../../../utils/path';
+import { fetchProducts } from '../../../http/productAPI';
 
-const ProductList = observer(() => {
-    const {product}=useContext(Context)
+const ProductList = () => {
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const limit = 12;
     const navigate = useNavigate();
+
+    const loadProducts = async (currentPage) => {
+        const data = await fetchProducts({ limit, page: currentPage });
+        if (data.rows.length < limit) {
+            setHasMore(false); // Якщо менше ніж ліміт — більше нічого немає
+        }
+        if (currentPage === 1) {
+            setProducts(data.rows);
+        } else {
+            setProducts(prev => [...prev, ...data.rows]);
+        }
+    };
+
+    useEffect(() => {
+        loadProducts(1);
+    }, []);
+
+    const loadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        loadProducts(nextPage);
+    };
+
     return (
         <div className='my-4'>
             <table className='product-list-table'>
@@ -25,21 +48,40 @@ const ProductList = observer(() => {
                     </tr>
                 </thead>
                 <tbody>
-                    {product.products.map(product=>
-                    <tr>
-                        <td><img className='product-list-img' src={product.img} alt="" /></td>
-                        <td>{product.id}</td>
-                        <td>{product.name}</td>
-                        <td>{product.quantity} шт.</td>
-                        <td>{product.price} грн.</td>
-                        <td>{product.disc_price} грн.</td>
-                        <td><img src="/static/edit-icon.svg" className='product-edit-icon' alt="" onClick={() => navigate(`${EDIT_PRODUCT_ROUTE}/${product.id}`)}/></td>
-                    </tr>
-                    )} 
+                    {products.map(product => (
+                        <tr key={product.id}>
+                            <td>
+                                <img
+                                    className='product-list-img'
+                                    src={product.images?.find(img => img.isPreview)?.img}
+                                    alt="product"
+                                />
+                            </td>
+                            <td>{product.id}</td>
+                            <td>{product.name}</td>
+                            <td>{product.quantity} шт.</td>
+                            <td>{product.price} грн.</td>
+                            <td>{product.disc_price} грн.</td>
+                            <td>
+                                <img
+                                    src="/static/edit-icon.svg"
+                                    className='product-edit-icon'
+                                    alt="edit"
+                                    onClick={() => navigate(`${EDIT_PRODUCT_ROUTE}/${product.id}`)}
+                                />
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
-        </div>
-    )
-})
 
-export default ProductList
+            {hasMore && (
+                <div className='text-center my-4'>
+                    <button onClick={loadMore} className='btn btn-primary'>Показати ще</button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ProductList;

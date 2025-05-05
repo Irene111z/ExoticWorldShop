@@ -1,9 +1,15 @@
-const {Product, ProductFeatures, Category, Review} = require('../models/models')
+const {Product, ProductFeatures, Category, Review, ProductImage} = require('../models/models')
 const { Op } = require("sequelize");
 
 class ProductRepository{
-    async createProduct(data){
-        return await Product.create(data)
+    async createProduct(data) {
+        return await Product.create(data);
+    }
+    async addProductImage({ productId, img, isPreview }) {
+        return await ProductImage.create({ productId, img, isPreview });
+    }
+    async addProductFeature({ name, description, productId }) {
+        return await ProductFeatures.create({ name, description, productId });
     }
     async deleteProduct(id){
         const product = await Product.findByPk(id)
@@ -16,18 +22,31 @@ class ProductRepository{
             where: { id },
             include: [
                 { model: ProductFeatures },
-                { model: Review, attributes: ['rate'] }
-            ],
+                { model: Review, attributes: ['rate'] },
+                { model: ProductImage, attributes: ['img', 'isPreview'] }
+            ]
         });
     
-        if (!product){
-            throw new Error("Товар не знайдено")
-        }
-        
-        const ratings = product.reviews.map(review => review.rate);
-        const averageRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+        if (!product) throw new Error("Товар не знайдено");
     
-        return { ...product.toJSON(), averageRating: parseFloat(averageRating.toFixed(2)) };
+        const ratings = product.reviews.map(r => r.rate);
+        const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+    
+        return { ...product.toJSON(), averageRating: parseFloat(avgRating.toFixed(2)) };
+    }
+    async getAllProducts(filter, limit, offset) {
+        return await Product.findAndCountAll({
+            where: filter,
+            limit,
+            offset,
+            include: [
+                {
+                  model: ProductImage,
+                  as: 'images',
+                  required: false
+                }
+              ]
+        });
     }
     async getProductById(id) {
         return await Product.findByPk(id);
@@ -40,13 +59,7 @@ class ProductRepository{
             offset,
         });
     }
-    async getAllProducts(filter, limit, offset) {
-        return await Product.findAndCountAll({
-            where: filter,
-            limit,
-            offset,
-        });
-    }
+    
     async getSubcategories(parentId) {
         const subcategories = await Category.findAll({ where: { parentId } });
         let ids = subcategories.map(sub => sub.id);

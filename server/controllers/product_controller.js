@@ -3,12 +3,12 @@ const ApiError = require('../errors/ApiError')
 
 class ProductController{
     
-    async createProduct(req, res, next){
+    async createProduct(req, res, next) {
         try {
             const product = await product_service.createProduct(req.body, req.files);
-            res.status(200).json(product);
+            return res.status(200).json(product);
         } catch (error) {
-            next(ApiError.badRequest(error.message)) 
+            next(ApiError.badRequest(error.message));
         }
     }
     async deleteProduct(req, res, next){

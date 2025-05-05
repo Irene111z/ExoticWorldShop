@@ -187,8 +187,8 @@ Order.hasMany(OrderItem)
 OrderItem.belongsTo(Order)
 Product.hasMany(OrderItem)
 OrderItem.belongsTo(Product)
-Product.hasMany(ProductImage)
-ProductImage.belongsTo(Product)
+Product.hasMany(ProductImage, { as: 'images' });
+ProductImage.belongsTo(Product);
 Category.hasMany(Product)
 Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' });
 Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' });
