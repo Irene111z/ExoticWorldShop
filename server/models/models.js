@@ -199,7 +199,7 @@ Product.hasMany(Review)
 Review.belongsTo(Product)
 Product.hasMany(CartItem)
 CartItem.belongsTo(Product)
-Product.hasMany(ProductFeatures)
+Product.hasMany(ProductFeatures, { as: 'productFeatures' });
 ProductFeatures.belongsTo(Product)
 
 const Wishlist = sequelize.define(

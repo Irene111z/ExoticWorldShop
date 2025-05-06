@@ -1,7 +1,10 @@
-const {Product, ProductFeatures, Category, Review, ProductImage} = require('../models/models')
+const { Product, ProductFeatures, Category, Review, ProductImage } = require('../models/models')
 const { Op } = require("sequelize");
+const sequelize = require('../database');
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
-class ProductRepository{
+class ProductRepository {
     async createProduct(data) {
         return await Product.create(data);
     }
@@ -11,28 +14,11 @@ class ProductRepository{
     async addProductFeature({ name, description, productId }) {
         return await ProductFeatures.create({ name, description, productId });
     }
-    async deleteProduct(id){
+    async deleteProduct(id) {
         const product = await Product.findByPk(id)
-        if(product){
+        if (product) {
             product.destroy()
         }
-    }
-    async getProduct(id) {
-        const product = await Product.findOne({
-            where: { id },
-            include: [
-                { model: ProductFeatures },
-                { model: Review, attributes: ['rate'] },
-                { model: ProductImage, attributes: ['img', 'isPreview'] }
-            ]
-        });
-    
-        if (!product) throw new Error("Товар не знайдено");
-    
-        const ratings = product.reviews.map(r => r.rate);
-        const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
-    
-        return { ...product.toJSON(), averageRating: parseFloat(avgRating.toFixed(2)) };
     }
     async getAllProducts(filter, limit, offset) {
         return await Product.findAndCountAll({
@@ -41,16 +27,83 @@ class ProductRepository{
             offset,
             include: [
                 {
-                  model: ProductImage,
-                  as: 'images',
-                  required: false
+                    model: ProductImage,
+                    as: 'images',
+                    required: false
                 }
-              ]
+            ]
         });
     }
-    async getProductById(id) {
-        return await Product.findByPk(id);
+    async getProduct(id) {
+        return await Product.findOne({
+            where: { id },
+            include: [
+                { model: ProductFeatures, as: 'productFeatures' },
+                { model: Review, attributes: ['rate'] },
+                {
+                    model: ProductImage,
+                    as: 'images',
+                    attributes: ['img', 'isPreview'],
+                    required: false
+                }
+            ]
+        });
     }
+    async updateProductFields(id, fields) {
+        const product = await Product.findByPk(id);
+        if (!product) return null;
+        Object.assign(product, fields);
+        return await product.save();
+    }
+
+    async getProductImages(productId) {
+        return await ProductImage.findAll({ where: { productId } });
+    }
+
+    async deleteProduct(id) {
+        const t = await sequelize.transaction();
+    
+        try {
+            // Видаляємо характеристики товару
+            await ProductFeatures.destroy({ where: { productId: id }, transaction: t });
+    
+            // Видаляємо записи зображень з БД
+            await ProductImage.destroy({ where: { productId: id }, transaction: t });
+    
+            // Видаляємо сам товар
+            await Product.destroy({ where: { id }, transaction: t });
+    
+            await t.commit();
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
+
+    async clearPreviewFlags(productId) {
+        return await ProductImage.update({ isPreview: false }, { where: { productId } });
+    }
+
+    async setPreviewImage(imgUrl) {
+        return await ProductImage.update({ isPreview: true }, { where: { img: imgUrl } });
+    }
+
+    async addProductImage({ productId, img, isPreview }) {
+        return await ProductImage.create({ productId, img, isPreview });
+    }
+
+    async replaceProductFeatures(productId, features) {
+        await ProductFeatures.destroy({ where: { productId } });
+
+        for (const f of features) {
+            await ProductFeatures.create({
+                name: f.name,
+                description: f.description,
+                productId
+            });
+        }
+    }
+
     async searchByName(name, limit, offset) {
         if (!name) return { count: 0, rows: [] };
         return await Product.findAndCountAll({
@@ -59,7 +112,7 @@ class ProductRepository{
             offset,
         });
     }
-    
+
     async getSubcategories(parentId) {
         const subcategories = await Category.findAll({ where: { parentId } });
         let ids = subcategories.map(sub => sub.id);
@@ -71,37 +124,29 @@ class ProductRepository{
 
         return ids;
     }
-    async updateProduct(id, data) {
-        const product = await this.getProductById(id);
-        if (!product) {
-            throw new Error("Товар не знайдено");
-        }
 
-        Object.assign(product, data);
-        return await product.save();
+    async getProductReviews(productId) {
+        return await Review.findAndCountAll({ where: { productId } })
     }
-    async getProductReviews(productId){
-        return await Review.findAndCountAll({where:{productId}})
-    }
-    async createProductReview(data){
+    async createProductReview(data) {
         return await Review.create(data)
     }
-    async findProductByReviewId(reviewId){
+    async findProductByReviewId(reviewId) {
         reviewId = Number(reviewId)
         const review = await Review.findByPk(reviewId)
-        if(!review){
+        if (!review) {
             throw new Error("Відгук не знайдено")
         }
-        return await Product.findOne({where:{id:review.productId}})
+        return await Product.findOne({ where: { id: review.productId } })
     }
-    async getReviewById(reviewId){
+    async getReviewById(reviewId) {
         return await Review.findByPk(reviewId)
     }
-    async deleteProductReview(review){
+    async deleteProductReview(review) {
         return await review.destroy()
     }
-    async hasUserReviewedProduct(userId, productId){
-        return await Review.findOne({where:{userId, productId}})
+    async hasUserReviewedProduct(userId, productId) {
+        return await Review.findOne({ where: { userId, productId } })
     }
 }
 

@@ -285,8 +285,8 @@ const CreateProduct = observer(() => {
           <div className="mb-2">
             {features.length > 0 && features.map(feature => (
               <div key={feature.id} className="d-flex mb-1">
+                <img src="/static/delete-icon.svg" alt="" onClick={() => handleDeleteFeature(feature.id)} className='me-3'/>
                 <span><strong>{feature.name}</strong>: {feature.description}</span>
-                <img src="/static/delete-icon.svg" alt="" onClick={() => handleDeleteFeature(feature.id)} className='ms-3'/>
               </div>
             ))}
           </div>

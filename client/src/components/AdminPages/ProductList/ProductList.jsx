@@ -14,7 +14,7 @@ const ProductList = () => {
     const loadProducts = async (currentPage) => {
         const data = await fetchProducts({ limit, page: currentPage });
         if (data.rows.length < limit) {
-            setHasMore(false); // Якщо менше ніж ліміт — більше нічого немає
+            setHasMore(false);
         }
         if (currentPage === 1) {
             setProducts(data.rows);

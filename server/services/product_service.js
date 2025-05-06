@@ -9,11 +9,25 @@ function extractPublicId(url) {
     try {
         const parts = url.split('/');
         const fileWithExtension = parts[parts.length - 1];
-        const publicId = fileWithExtension.split('.')[0]; // Видаляємо .jpg/.png
-        return 'products/' + publicId; // Додаємо папку, якщо ти зберігаєш в 'products'
+        const publicId = fileWithExtension.split('.')[0];
+        return 'products/' + publicId;
     } catch (e) {
         return null;
     }
+}
+async function uploadToCloudinary(fileBuffer) {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: 'products'
+            },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+        streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+    });
 }
 
 class ProductService {
@@ -22,15 +36,15 @@ class ProductService {
         const {
             name, price, disc_price, description, quantity, categoryId, brandId, productFeatures
         } = data;
-    
+
         const finalDiscPrice = disc_price ? Number(disc_price) : null;
         const product = await product_repository.createProduct({
             name, price, disc_price: finalDiscPrice, description, quantity, categoryId, brandId
         });
-    
+
         if (files?.images) {
             const images = Array.isArray(files.images) ? files.images : [files.images];
-    
+
             const uploadPromises = images.map((file, index) => {
                 return new Promise(async (resolve, reject) => {
                     try {
@@ -49,25 +63,25 @@ class ProductService {
                                 streamifier.createReadStream(file.data).pipe(stream);
                             });
                         };
-    
+
                         const result = await uploadStream();
-    
+
                         await product_repository.addProductImage({
                             productId: product.id,
                             img: result.secure_url,
                             isPreview: index === Number(data.previewImageIndex)
                         });
-    
+
                         resolve();
                     } catch (err) {
                         reject(err);
                     }
                 });
             });
-    
+
             await Promise.all(uploadPromises);
         }
-    
+
         // Додавання характеристик
         if (productFeatures) {
             const features = JSON.parse(productFeatures);
@@ -78,15 +92,14 @@ class ProductService {
                     productId: product.id
                 })
             );
-    
+
             await Promise.all(featurePromises);
         }
-    
+
         return product;
     }
-    
     async deleteProduct(id) {
-        const product = await product_repository.getProductById(id);
+        const product = await product_repository.getProduct(id);
     
         if (!product) {
             throw new Error("Товару не існує");
@@ -104,10 +117,11 @@ class ProductService {
         });
     
         await Promise.all(deletePromises);
+    
+        // Видаляємо товар (всередині також видаляються картинки та характеристики)
         await product_repository.deleteProduct(id);
     }
-      
-    async getAllProducts(query) {
+        async getAllProducts(query) {
         const { brandId, categoryId } = query;
         const limit = Number(query.limit) || 12;
         const page = Number(query.page) || 1;
@@ -124,16 +138,91 @@ class ProductService {
         return await product_repository.getAllProducts(filter, limit, offset)
     }
     async getProduct(id) {
-        return await product_repository.getProduct(id);
+        try {
+            const product = await product_repository.getProduct(id);  // Викликаємо репозиторій для отримання продукту
+
+            if (!product) {
+                throw new Error("Товар не знайдено");
+            }
+
+            // Обчислюємо середній рейтинг продукту
+            const ratings = product.reviews.map(r => r.rate);
+            const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+
+            return {
+                ...product.toJSON(),
+                averageRating: parseFloat(avgRating.toFixed(2)),
+            };
+        } catch (error) {
+            throw new Error("Помилка при отриманні продукту: " + error.message);
+        }
+    }
+    async changeProduct(id, data, files) {
+        const product = await product_repository.getProduct(id);
+        if (!product) throw new Error("Товар не знайдено");
+
+        const {
+            oldImages,
+            productFeatures,
+            previewImageIndex,
+            images,
+            ...productFields
+        } = data;
+
+        await product_repository.updateProductFields(id, productFields);
+
+        if (oldImages) {
+            const oldImgs = JSON.parse(oldImages);
+            const currentImgs = await product_repository.getProductImages(id);
+
+            for (const img of currentImgs) {
+                if (!oldImgs.find(o => o.img === img.img)) {
+                    const publicId = extractPublicId(img.img);
+                    if (publicId) {
+                        try {
+                            await cloudinary.uploader.destroy(publicId);
+                        } catch (e) {
+                            console.warn("Cloudinary delete failed:", publicId);
+                        }
+                    }
+                    await product_repository.deleteProductImage(img.id);
+                }
+            }
+
+            await product_repository.clearPreviewFlags(id);
+            const preview = oldImgs.find(img => img.isPreview);
+            if (preview) {
+                await product_repository.setPreviewImage(preview.img);
+            }
+        }
+
+        if (files?.images) {
+            const imagesArray = Array.isArray(files.images) ? files.images : [files.images];
+
+            for (let i = 0; i < imagesArray.length; i++) {
+                const file = imagesArray[i];
+                const uploaded = await uploadToCloudinary(file.data);
+
+                await product_repository.addProductImage({
+                    productId: id,
+                    img: uploaded.secure_url,
+                    isPreview: Number(previewImageIndex) === i
+                });
+            }
+        }
+
+        if (productFeatures) {
+            const parsed = JSON.parse(productFeatures);
+            await product_repository.replaceProductFeatures(id, parsed);
+        }
+
+        return product_repository.getProduct(id);
     }
     async searchProductByName(query) {
         const { name, limit = 12, page = 1 } = query
         const offset = page * limit - limit
         return await product_repository.searchByName(name, limit, offset)
 
-    }
-    async changeProduct(id, data) {
-        return await product_repository.updateProduct(id, data);
     }
     async getProductReviews(productId) {
         const product = await product_repository.getProductById(productId)
