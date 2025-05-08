@@ -172,7 +172,7 @@ class ProductService {
         if (oldImages) {
             const oldImgs = JSON.parse(oldImages);
             const currentImgs = await product_repository.getProductImages(id);
-
+        
             for (const img of currentImgs) {
                 if (!oldImgs.find(o => o.img === img.img)) {
                     const publicId = extractPublicId(img.img);
@@ -186,13 +186,14 @@ class ProductService {
                     await product_repository.deleteProductImage(img.id);
                 }
             }
-
+        
             await product_repository.clearPreviewFlags(id);
             const preview = oldImgs.find(img => img.isPreview);
             if (preview) {
                 await product_repository.setPreviewImage(preview.img);
             }
         }
+        
 
         if (files?.images) {
             const imagesArray = Array.isArray(files.images) ? files.images : [files.images];

@@ -122,6 +122,14 @@ class ProductRepository {
 
         return ids;
     }
+    
+    async deleteProductImage(imageId) {
+        const image = await ProductImage.findByPk(imageId);
+        if (image) {
+            return await image.destroy();
+        }
+        throw new Error("Image not found");
+    }
 
     async getProductReviews(productId) {
         return await Review.findAndCountAll({ where: { productId } })
