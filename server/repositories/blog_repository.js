@@ -1,8 +1,8 @@
-const {Author, Post, PostAuthor} = require('../models/models')
+const { Author, Post, PostAuthor } = require('../models/models')
 
-class BlogRepository{
-    async createPost(title, preview, content, authorIds){
-        const post = await Post.create({title, preview, content})
+class BlogRepository {
+    async createPost(title, preview, content, authorIds) {
+        const post = await Post.create({ title, preview, content })
         const authors = await Author.findAll({
             where: {
                 id: authorIds
@@ -11,46 +11,73 @@ class BlogRepository{
         await post.addAuthors(authors);
         return post;
     }
-    async getPostByTitle(title){
-       return await Post.findOne({where:{title}})
+    async getPostByTitle(title) {
+        return await Post.findOne({ where: { title } })
     }
-    async getPostById(id){
-        return await Post.findByPk(id)
-     }
-    async updatePost(post, data){
-        const {title, authorIds} = data
-        if(title && title !== post.title){
-            const existingPost = await this.getPostByTitle(title)
-            if(existingPost){
-                throw new Error("Пост з такою назвою вже існує, оберіть іншу назву")
-            }
+    async getPostById(id) {
+        return await Post.findByPk(id);
+    }
+    async updatePost(post, data) {
+        const { title, content, authorIds } = data;
+    
+        // Оновлення поля заголовка
+        if (title) {
+            post.title = title;
         }
-        if(authorIds && authorIds.length <1){
-            throw new Error("Пост має мати принаймні одного автора")
+    
+        // Оновлення контенту
+        if (content) {
+            post.content = content;
         }
-        Object.assign(post, data);
-        return await post.save();
-    }   
-    async deletePost(post){
+    
+        // Оновлення авторів
+        if (authorIds) {
+            await post.setAuthors(authorIds);  // Заміняє всіх авторів поста
+        }
+    
+        // Збереження посту
+        await post.save();
+        return post;
+    }
+    
+    async deletePost(post) {
         return await post.destroy()
     }
-    async getAllPosts(){
-        return await Post.findAndCountAll({attributes: ['title', 'preview']})
+    async getAllPosts(page, limit) {
+        const posts = await Post.findAndCountAll({
+            attributes: ['id', 'title', 'preview', 'createdAt'],
+            limit: limit, // Кількість постів на сторінку
+            offset: (page - 1) * limit, // Визначаємо offset для пагінації
+        });
+
+        return {
+            posts: posts.rows, // Пости для поточної сторінки
+            total: posts.count, // Загальна кількість постів
+        };
     }
-    async getFullPost(id){
-        const post = await Post.findOne({where:{id},
-            attributes: ['title', 'preview', 'content', 'createdAt'],
-            include: [
-                {
+    async getFullPost(id) {
+        try {
+            const post = await Post.findOne({
+                where: { id },
+                attributes: ['title', 'preview', 'content', 'createdAt'],
+                include: [{
                     model: Author,
-                    attributes: ['name', 'lastname', 'occupation', 'workplace', 'sity'],
-                    through: { attributes: [] }
-                }
-            ]
-        })
-        const formattedPost = post.get({ plain: true });
-        formattedPost.createdAt = new Date(formattedPost.createdAt).toISOString().split('T')[0];
-        return formattedPost;
+                    attributes: ['id', 'name', 'lastname', 'occupation', 'workplace', 'sity'],
+                    through: { attributes: [] },
+                    as: 'authors'
+                }]
+            });
+
+            if (!post) {
+                return null;
+            }
+
+            const formattedPost = post.get({ plain: true });
+            formattedPost.createdAt = new Date(formattedPost.createdAt).toISOString().split('T')[0];
+            return formattedPost;
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 }
 

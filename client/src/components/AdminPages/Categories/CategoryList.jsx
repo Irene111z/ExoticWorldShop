@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
-import categoryStore from "../../../context/CategoryContext";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Accordion, AccordionSummary, AccordionDetails, Typography, CssBaseline, Box, Paper } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";

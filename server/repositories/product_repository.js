@@ -1,8 +1,6 @@
 const { Product, ProductFeatures, Category, Review, ProductImage } = require('../models/models')
 const { Op } = require("sequelize");
 const sequelize = require('../database');
-const { v4: uuidv4 } = require('uuid');
-const path = require('path');
 
 class ProductRepository {
     async createProduct(data) {

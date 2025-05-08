@@ -4,6 +4,8 @@ export const CREATE_PRODUCT_ROUTE = '/admin/products/create'
 export const EDIT_PRODUCT_ROUTE = '/admin/products/edit'
 export const CATEGORIES_MANAGEMENT_ROUTE = '/admin/categories'
 export const POSTS_MANAGEMENT_ROUTE = '/admin/posts'
+export const CREATE_POST_ROUTE = '/admin/posts/create'
+export const EDIT_POST_ROUTE = '/admin/posts/edit'
 
 export const LOGIN_ROUTE = '/login'
 export const REGISTRATION_ROUTE = '/registration'

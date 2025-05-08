@@ -257,7 +257,7 @@ const CreateProduct = observer(() => {
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
             >
-              <option value="" disabled hidden>Виберіть бренд</option>
+              <option value="" disabled hidden>Оберіть бренд</option>
               {brands.map((brand) => (
                 <option key={brand.id} value={brand.id}>{brand.name}</option>
               ))}

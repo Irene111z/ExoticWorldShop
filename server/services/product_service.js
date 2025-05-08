@@ -1,6 +1,4 @@
 const product_repository = require('../repositories/product_repository')
-const uuid = require('uuid')
-const path = require('path')
 const { Op } = require('sequelize');
 const streamifier = require('streamifier');
 const { cloudinary } = require('../utils/cloudinary');

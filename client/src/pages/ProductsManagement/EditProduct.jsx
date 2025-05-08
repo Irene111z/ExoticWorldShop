@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import './ProductsManagement.css'
 import { fetchCategories, createBrand, fetchBrands, fetchProductById, updateProduct, deleteProduct } from '../../http/productAPI';

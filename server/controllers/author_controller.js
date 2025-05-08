@@ -45,7 +45,7 @@ class AuthorController{
     async getAllAuthors(req, res, next){
         try {
             const authors = await author_service.getAllAuthors()
-            return res.status(201).json(authors)
+            return res.status(201).json(authors.rows)
           } 
           catch (error) {
             next(ApiError.internal(error.message));

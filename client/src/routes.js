@@ -3,6 +3,8 @@ import ProductsManagement from './pages/ProductsManagement/ProductsManagement'
 import CreateProduct from './pages/ProductsManagement/CreateProduct'
 import EditProduct from './pages/ProductsManagement/EditProduct'
 import PostsManagement from './pages/PostsManagement/PostsManagement'
+import CreatePost from './pages/PostsManagement/CreatePost'
+import EditPost from './pages/PostsManagement/EditPost'
 import CategoriesManagement from './pages/CategoriesManagement/CategoriesManagement'
 import Wishlist from './pages/Wishlist';
 import Bookmarks from './pages/Bookmarks';
@@ -11,7 +13,7 @@ import Auth from './pages/Auth';
 import Blog from './pages/Blog';
 import OrderPage from './pages/OrderPage';
 import Catalog from './pages/Catalog';
-import PostPage from './pages/PostPage';
+import PostPage from './pages/PostPage/PostPage';
 import ProductPage from './pages/ProductPage';
 import UserProfile from './pages/UserProfile/UserProfile';
 import * as path from '../src/utils/path'
@@ -34,6 +36,12 @@ export const authRoutes = [
     },
     {   path: path.POSTS_MANAGEMENT_ROUTE,
         Component: PostsManagement
+    },
+    {   path: path.EDIT_POST_ROUTE + '/:id',
+        Component: EditPost
+    },
+    {   path: path.CREATE_POST_ROUTE,
+        Component: CreatePost
     },
     {
         path: path.WISHLIST_ROUTE,
@@ -79,7 +87,7 @@ export const publicRoutes = [
         Component: OrderPage
     },
     {
-        path: path.POST_ROUTE,
+        path: path.POST_ROUTE + '/:id',
         Component: PostPage
     },
 

@@ -220,8 +220,8 @@ const PostAuthor = sequelize.define('post_author',
     }
 )
 
-Post.belongsToMany(Author, { through: PostAuthor});
-Author.belongsToMany(Post, { through: PostAuthor});
+Post.belongsToMany(Author, { through: PostAuthor, as: 'authors' });
+Author.belongsToMany(Post, { through: PostAuthor, as: 'posts' });
 
 const Bookmarks = sequelize.define(
     'bookmarks',
