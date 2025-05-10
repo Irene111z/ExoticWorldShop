@@ -5,6 +5,7 @@ import { useContext, useState } from 'react';
 import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import AuthForm from '../AuthForm/AuthForm';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
@@ -16,6 +17,11 @@ const Navbar = observer(({ isHomePage }) => {
 
     const closeAuthModal = () => {
         setShowAuthModal(false);
+    };
+
+    const handleProtectedClick = (redirectPath) => {
+        localStorage.setItem('redirectUrl', redirectPath);
+        openAuthModal();
     };
 
     return (
@@ -43,7 +49,7 @@ const Navbar = observer(({ isHomePage }) => {
                             <img src="/static/navbar-profile.svg" alt="" />
                         </Link>
                     ) : (
-                        <div className='me-4' onClick={openAuthModal}>
+                        <div className='me-4' onClick={() => handleProtectedClick(PROFILE_ROUTE)}>
                             <img src="/static/navbar-profile.svg" alt="" />
                         </div>
                     )}
@@ -54,7 +60,7 @@ const Navbar = observer(({ isHomePage }) => {
                                 <img src="/static/navbar-wishlist.svg" alt="" />
                             </Link>
                         ) : (
-                            <div className='text-center py-0' onClick={openAuthModal}>
+                            <div className='text-center py-0' onClick={() => handleProtectedClick(WISHLIST_ROUTE)}>
                                 <img src="/static/navbar-wishlist.svg" alt="" />
                             </div>
                         )}
@@ -66,7 +72,7 @@ const Navbar = observer(({ isHomePage }) => {
                                 <img src="/static/navbar-saving.svg" alt="" />
                             </Link>
                         ) : (
-                            <div className='text-center py-0' onClick={openAuthModal}>
+                            <div className='text-center py-0' onClick={() => handleProtectedClick(BOOKMARKS_ROUTE)}>
                                 <img src="/static/navbar-saving.svg" alt="" />
                             </div>
                         )}

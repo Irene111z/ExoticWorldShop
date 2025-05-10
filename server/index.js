@@ -14,7 +14,10 @@ const app = express()
 app.use(cors())
 app.use(express.static(path.resolve(__dirname, 'static')))
 app.use(express.json())
-app.use(fileUpload({}))
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: path.resolve(__dirname, 'tmp')
+}))
 app.use('/api',router)
 
 //last Middleware

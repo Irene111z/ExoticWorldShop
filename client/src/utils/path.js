@@ -7,9 +7,6 @@ export const POSTS_MANAGEMENT_ROUTE = '/admin/posts'
 export const CREATE_POST_ROUTE = '/admin/posts/create'
 export const EDIT_POST_ROUTE = '/admin/posts/edit'
 
-export const LOGIN_ROUTE = '/login'
-export const REGISTRATION_ROUTE = '/registration'
-
 export const HOMEPAGE_ROUTE = '/'
 
 export const PRODUCT_ROUTE = '/product'

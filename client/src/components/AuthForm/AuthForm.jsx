@@ -1,14 +1,14 @@
 import './AuthForm.css';
 import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ORDERS_MANAGEMENT_ROUTE } from '../../utils/path';
-import { registration, login } from '../../http/userAPI';
+import { registration, login, fetchDefaultAvatars } from '../../http/userAPI';
 
 const AuthForm = observer(({ onClose }) => {
 
-    const {user} = useContext(Context)
+    const { user } = useContext(Context)
     const [loginForm, setLoginForm] = useState(true);
     const [passwordShown, setPasswordShown] = useState(false);
     const [email, setEmail] = useState('')
@@ -25,22 +25,41 @@ const AuthForm = observer(({ onClose }) => {
         setPasswordShown(!passwordShown);
     };
 
-    const avatarList = ['non-avatar1.jpg', 'non-avatar2.jpg', 'non-avatar3.jpg'];
-    const getRandomAvatar = () => avatarList[Math.floor(Math.random() * avatarList.length)];
+    const [avatarList, setAvatarList] = useState([]);
+    const [randomAvatar, setRandomAvatar] = useState(null);
 
-    const signIn = async(e) => {
-        e.preventDefault();
-        const img = getRandomAvatar()
-        let data
-        data = await registration(email, password, name, lastname, phone, img)
-        user.setUser(user)
-        user.setIsAuth(true)
-        onClose();
-        const redirectUrl = localStorage.getItem('redirectUrl') || '/';
-        navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
-        localStorage.removeItem('redirectUrl');
+    useEffect(() => {
+        fetchDefaultAvatars()
+            .then(data => {
+                setAvatarList(data);
+                if (data.length > 0) {
+                    const random = data[Math.floor(Math.random() * data.length)];
+                    setRandomAvatar(random);
+                }
+            })
+            .catch(err => console.error('Помилка завантаження аватарів:', err));
+    }, []);
+
+    const signIn = async (e) => {
+    e.preventDefault();
+    if (!randomAvatar) {
+        console.warn('Аватар ще не готовий!');
+        return;
     }
-    const logIn = async(e) => {
+    const img = randomAvatar;
+    console.log('Random avatar:', img);
+
+    const data = await registration(email, password, name, lastname, phone, img);
+    user.setUser(user);
+    user.setIsAuth(true);
+    onClose();
+    const redirectUrl = localStorage.getItem('redirectUrl') || '/';
+    navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
+    localStorage.removeItem('redirectUrl');
+};
+
+
+    const logIn = async (e) => {
         e.preventDefault();
         let data;
         data = await login(email, password)
@@ -64,11 +83,11 @@ const AuthForm = observer(({ onClose }) => {
                     <div className="auth-panel auth-left" style={{ opacity: loginForm ? 1 : 0, visibility: loginForm ? "visible" : "hidden" }}>
                         <form className="auth-form" onSubmit={logIn}>
                             <h2 className='auth-form-title'>Вхід</h2>
-                            <input type="email" className="auth-form-input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}/>
+                            <input type="email" className="auth-form-input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                             <div className="password-container d-flex justify-content-between">
-                                <input type={passwordShown ? "text" : "password"}placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)}/>
+                                <input type={passwordShown ? "text" : "password"} placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} />
                                 <button type="button" className="btn-show-hide-password" onClick={togglePassword}>
-                                    <img src={passwordShown ? "/static/show-password-monkey.svg" : "/static/hide-password-monkey.svg"}/>
+                                    <img src={passwordShown ? "/static/show-password-monkey.svg" : "/static/hide-password-monkey.svg"} />
                                 </button>
                             </div>
                             <button className='btn-submit' type='submit'>Увійти</button>
@@ -81,14 +100,14 @@ const AuthForm = observer(({ onClose }) => {
                     <div className="auth-panel auth-right" style={{ opacity: loginForm ? 0 : 1, visibility: loginForm ? "hidden" : "visible" }}>
                         <form className="auth-form" onSubmit={signIn}>
                             <h2 className='auth-form-title'>Реєстрація</h2>
-                            <input type="text" className="auth-form-input" placeholder="Прізвище"  value={lastname} onChange={e => setLastname(e.target.value)}/>
-                            <input type="text" className="auth-form-input" placeholder="Ім'я"  value={name} onChange={e => setName(e.target.value)}/>
-                            <input type="text" className="auth-form-input" placeholder="Номер тел."  value={phone} onChange={e => setPhone(e.target.value)}/>
-                            <input type="email" className="auth-form-input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}/>
+                            <input type="text" className="auth-form-input" placeholder="Прізвище" value={lastname} onChange={e => setLastname(e.target.value)} />
+                            <input type="text" className="auth-form-input" placeholder="Ім'я" value={name} onChange={e => setName(e.target.value)} />
+                            <input type="text" className="auth-form-input" placeholder="Номер тел." value={phone} onChange={e => setPhone(e.target.value)} />
+                            <input type="email" className="auth-form-input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                             <div className="password-container d-flex justify-content-between">
-                                <input type={passwordShown ? "text" : "password"}placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)}/>
+                                <input type={passwordShown ? "text" : "password"} placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} />
                                 <button type="button" className="btn-show-hide-password" onClick={togglePassword}>
-                                    <img src={passwordShown ? "/static/show-password-monkey.svg" : "/static/hide-password-monkey.svg"}/>
+                                    <img src={passwordShown ? "/static/show-password-monkey.svg" : "/static/hide-password-monkey.svg"} />
                                 </button>
                             </div>
                             <button className='btn-submit' type='submit'>Зареєструватися</button>

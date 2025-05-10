@@ -1,101 +1,201 @@
-import React, { useState, useEffect } from "react";
-import { $authHost } from "../../http";
-import UserInfo from "../../components/UserProfileComponents/UserInfo/UserInfo";
-import UserInfoForm from "../../components/UserProfileComponents/UserInfoForm/UserInfoForm";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { fetchUserProfile, updateUserProfile } from '../../http/userAPI';
+import './UserProfile.css'
+import {Context} from '../../index'
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
-  const [userData, setUserData] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    lastname: "",
-    phone: "",
-    email: "",
-    delivery_info: "",
-    img: "",
-    imgFile: null,
+  const {user} = useContext(Context)
+  const navigate = useNavigate();
+  const logout = () =>{
+    user.setUser({})
+    user.setIsAuth(false)
+    localStorage.removeItem('token');
+    navigate('/');
+  }
+
+  const [userData, setUserData] = useState({
+    name: '',
+    lastname: '',
+    phone: '',
+    email: '',
+    delivery_info: '',
+    img: '',
   });
+  const [imgFile, setImgFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-        try {
-            const { data } = await $authHost.get("api/user/profile");
-            console.log("Завантажено userData:", data);
-            setUserData(data);
-            setFormData({
-                name: data.name || "",
-                lastname: data.lastname || "",
-                phone: data.phone || "",
-                email: data.email || "",
-                delivery_info: data.delivery_info || "",
-                img: data.img || "", // Завантажуємо старе зображення з профілю
-            });
-        } catch (error) {
-            console.error("Не вдалося отримати профіль:", error);
-        }
+    const loadProfile = async () => {
+      try {
+        const profile = await fetchUserProfile();
+        setUserData({
+          name: profile.name || '',
+          lastname: profile.lastname || '',
+          phone: profile.phone || '',
+          email: profile.email || '',
+          delivery_info: profile.delivery_info || '',
+          img: profile.img || '',
+        });
+        setPreviewUrl(profile.img || '');
+      } catch (error) {
+        console.error('Помилка завантаження профілю:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchUserProfile();
-}, []);
 
-  
+    loadProfile();
+  }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setImgFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      alert('Будь ласка, виберіть зображення');
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const form = new FormData();
-    
-    if (formData.name !== userData.name) {
-      form.append("name", formData.name);
+    const formData = new FormData();
+    formData.append('name', userData.name);
+    formData.append('lastname', userData.lastname);
+    formData.append('phone', userData.phone);
+    formData.append('email', userData.email);
+    formData.append('delivery_info', userData.delivery_info);
+    if (imgFile) {
+      formData.append('img', imgFile);
     }
-    if (formData.lastname !== userData.lastname) {
-      form.append("lastname", formData.lastname);
-    }
-    if (formData.phone !== userData.phone) {
-      form.append("phone", formData.phone);
-    }
-    if (formData.email !== userData.email) {
-      form.append("email", formData.email);
-    }
-    if (formData.delivery_info !== userData.delivery_info) {
-      form.append("delivery_info", formData.delivery_info);
-    }
-    
-    if (formData.imgFile) {
-      form.append("img", formData.imgFile);
-    }
-    
+
     try {
-      const { data } = await $authHost.put("api/user/profile", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setUserData(data);
+      const updated = await updateUserProfile(formData);
+      setUserData((prev) => ({ ...prev, img: updated.img }));
+      setPreviewUrl(updated.img);
       setIsEditing(false);
+      alert('Профіль оновлено');
     } catch (error) {
-      console.error("Помилка при редагуванні профілю:", error.response || error);
+      console.error('Помилка оновлення профілю:', error);
+      alert('Не вдалося оновити профіль');
     }
   };
-  
-  
-  
-  
 
-  if (!userData) return <div>Завантаження...</div>;
-
-  return (
+  return loading ? (
+    <div>Завантаження профілю...</div>
+  ) : (
     <div className="container-fluid container-xxl">
-      <div className="d-flex">
-        {isEditing ? (
-          <UserInfoForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
-        ) : (
-          <UserInfo userData={userData} onEditClick={() => setIsEditing(true)} />
-        )}
+      <div className="d-flex flex-column">
+        <form onSubmit={handleSubmit} className='user-profile-form mt-4'>
+          <div className="d-flex mb-3 flex-row-reverse">
+            <img src="/static/edit-icon-white.svg" alt="" className='edit-profile-icon' onClick={() => setIsEditing(true)}/>
+            <img src="/static/log-out-icon.svg" className='edit-profile-icon me-3' alt="" onClick={()=>logout()}/>
+          </div>
+          <div className='text-center'>
+            <img
+              src={previewUrl}
+              alt="img"
+              onClick={handleAvatarClick}
+              style={{
+                width: '200px',
+                height: '200px',
+                objectFit: 'cover',
+                borderRadius: '50%',
+                cursor: isEditing ? 'pointer' : 'default',
+                marginBottom: '1.5rem',
+              }}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+          </div>
+
+          <div className="d-flex">
+            <div className='d-flex flex-column me-3'>
+              <label>Прізвище:</label>
+              <input
+                type="text"
+                name="lastname"
+                value={userData.lastname}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
+            </div>
+            <div className='d-flex flex-column'>
+              <label className=''>Ім'я:</label>
+              <input
+                type="text"
+                name="name"
+                value={userData.name}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
+            </div>
+          </div>
+
+          <div className='d-flex flex-column'>
+            <label>Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={userData.email}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
+          </div>
+
+          <div className='d-flex flex-column'>
+            <label>Телефон:</label>
+            <input
+              type="tel"
+              name="phone"
+              value={userData.phone}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
+          </div>
+
+          <div className='d-flex flex-column'>
+            <label>Адреса доставки:</label>
+            <input
+              type="text"
+              name="delivery_info"
+              value={userData.delivery_info}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
+          </div>
+
+          {isEditing ? (
+            <div>
+              <button type="submit" className='btn-save-profile-changes mt-2'>Зберегти</button>
+            </div>
+          ) : (
+            <span></span>
+          )}
+        </form>
+      </div>
+      <div className="d-flex flex-column">
+
       </div>
     </div>
   );

@@ -1,6 +1,4 @@
 const blog_repository = require('../repositories/blog_repository')
-const uuid = require('uuid')
-const path = require('path')
 const { cloudinary } = require('../utils/cloudinary');
 const streamifier = require('streamifier');
 
@@ -43,10 +41,10 @@ class BlogService {
         if (!post) {
             throw new Error("Пост не знайдено");
         }
-    
+
         const { title, content, authorIds } = data;
-    
-        
+
+
         // Оновлення заголовка посту
         if (title && title !== post.title) {
             const existingPost = await blog_repository.getPostByTitle(title);
@@ -55,24 +53,24 @@ class BlogService {
             }
             post.title = title;
         }
-    
+
         // Оновлення контенту посту
         if (content !== undefined) {
             post.content = content;
         }
-    
+
         // Оновлення авторів
         if (authorIds && authorIds.length > 0) {
             // Оновлюємо авторів посту
             await post.setAuthors(authorIds);
         }
-    
+
         // Якщо потрібно оновити зображення прев'ю
         if (previewFile) {
             // Видалення старого зображення з Cloudinary
             const publicId = post.preview.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(`posts/${publicId}`);
-    
+
             // Завантаження нового зображення на Cloudinary
             const uploadStream = () => {
                 return new Promise((resolve, reject) => {
@@ -89,25 +87,33 @@ class BlogService {
                     streamifier.createReadStream(previewFile.data).pipe(stream);
                 });
             };
-    
+
             const result = await uploadStream();
             // Оновлення URL прев'ю
             post.preview = result.secure_url;
         }
-    
+
         // Оновлення посту в базі даних
         await post.save();
         return post;
     }
-    
 
     async deletePost(id) {
-        const post = await blog_repository.getPostById(id)
+        const post = await blog_repository.getPostById(id);
         if (!post) {
-            return next(ApiError.badRequest("Пост не знайдено"))
+            throw new Error("Пост не знайдено");
         }
-        return await blog_repository.deletePost(post)
+
+        // Видалення зображення з Cloudinary
+        if (post.preview) {
+            const filename = post.preview.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(`posts/${filename}`);
+        }
+
+        // Видалення поста з БД
+        return await blog_repository.deletePost(post);
     }
+
     async getAllPosts(page, limit) {
         const pageNumber = parseInt(page);
         const limitNumber = parseInt(limit);

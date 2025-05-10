@@ -9,7 +9,6 @@ import CategoriesManagement from './pages/CategoriesManagement/CategoriesManagem
 import Wishlist from './pages/Wishlist';
 import Bookmarks from './pages/Bookmarks';
 import HomePage from './pages/HomePage';
-import Auth from './pages/Auth';
 import Blog from './pages/Blog';
 import OrderPage from './pages/OrderPage';
 import Catalog from './pages/Catalog';
@@ -69,14 +68,6 @@ export const publicRoutes = [
     {
         path: path.PRODUCT_ROUTE + '/:id',
         Component: ProductPage
-    },
-    {
-        path: path.LOGIN_ROUTE,
-        Component: Auth
-    },
-    {
-        path: path.REGISTRATION_ROUTE,
-        Component: Auth
     },
     {
         path: path.BLOG_ROUTE,

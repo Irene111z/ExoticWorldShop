@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchPostById, updatePost, fetchAuthors, createAuthor } from '../../http/blogAPI';
+import { fetchPostById, updatePost, deletePost, fetchAuthors, createAuthor } from '../../http/blogAPI';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 
@@ -32,14 +32,26 @@ const EditPost = () => {
   const handleClick = () => {
     fileInputRef.current.click();
   };
+  const handleDelete = async () => {
+    if (window.confirm('Ви впевнені, що хочете видалити цю статтю?')) {
+      try {
+        await deletePost(id);
+        alert('Статтю успішно видалено.');
+        navigate('/blog'); // або інший маршрут на список постів
+      } catch (error) {
+        console.error('Помилка при видаленні поста:', error);
+        alert('Не вдалося видалити статтю.');
+      }
+    }
+  };
 
   // Завантажуємо дані посту та авторів
   useEffect(() => {
     const loadPost = async () => {
       try {
-        const data = await fetchPostById(id);  // отримуємо пост з авторами
+        const data = await fetchPostById(id)
         setPost(data);
-        setSelectedAuthors(data.authors || []); // якщо дані з авторами є, зберігаємо їх у selectedAuthors
+        setSelectedAuthors(data.authors || []); 
         setPreviewUrl(data.preview);
       } catch (error) {
         console.error('Не вдалося завантажити пост:', error);
@@ -149,6 +161,7 @@ const EditPost = () => {
     <div className="container create-post-form">
       <p className='posts-title mt-3'>Редагувати статтю</p>
       <form onSubmit={handleSubmit}>
+        <button type="button" className="btn-delete-product mb-3" onClick={handleDelete}>Видалити статтю</button>
         <div className="d-flex">
           <div className="d-flex flex-column me-3">
             <label htmlFor="preview">Обкладинка</label>
