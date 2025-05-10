@@ -1,6 +1,5 @@
 const product_repository = require('../repositories/product_repository')
 const { Op } = require('sequelize');
-const streamifier = require('streamifier');
 const { cloudinary } = require('../utils/cloudinary');
 
 function extractPublicId(url) {
@@ -12,20 +11,6 @@ function extractPublicId(url) {
     } catch (e) {
         return null;
     }
-}
-async function uploadToCloudinary(fileBuffer) {
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder: 'products'
-            },
-            (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-            }
-        );
-        streamifier.createReadStream(fileBuffer).pipe(uploadStream);
-    });
 }
 
 class ProductService {
@@ -43,44 +28,24 @@ class ProductService {
         if (files?.images) {
             const images = Array.isArray(files.images) ? files.images : [files.images];
 
-            const uploadPromises = images.map((file, index) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const uploadStream = () => {
-                            return new Promise((resolve, reject) => {
-                                const stream = cloudinary.uploader.upload_stream(
-                                    {
-                                        folder: 'products',
-                                        resource_type: 'image'
-                                    },
-                                    (error, result) => {
-                                        if (error) reject(error);
-                                        else resolve(result);
-                                    }
-                                );
-                                streamifier.createReadStream(file.data).pipe(stream);
-                            });
-                        };
+            for (let i = 0; i < images.length; i++) {
+                const file = images[i];
+                if (!file.mimetype.startsWith('image')) {
+                    throw new Error('Один із файлів не є зображенням');
+                }
 
-                        const result = await uploadStream();
-
-                        await product_repository.addProductImage({
-                            productId: product.id,
-                            img: result.secure_url,
-                            isPreview: index === Number(data.previewImageIndex)
-                        });
-
-                        resolve();
-                    } catch (err) {
-                        reject(err);
-                    }
+                const uploadResponse = await cloudinary.uploader.upload(file.tempFilePath, {
+                    folder: 'products',
                 });
-            });
 
-            await Promise.all(uploadPromises);
+                await product_repository.addProductImage({
+                    productId: product.id,
+                    img: uploadResponse.secure_url,
+                    isPreview: i === Number(data.previewImageIndex)
+                });
+            }
         }
 
-        // Додавання характеристик
         if (productFeatures) {
             const features = JSON.parse(productFeatures);
             const featurePromises = features.map(feature =>
@@ -98,14 +63,13 @@ class ProductService {
     }
     async deleteProduct(id) {
         const product = await product_repository.getProduct(id);
-    
+
         if (!product) {
             throw new Error("Товару не існує");
         }
-    
+
         const images = product.images || [];
-    
-        // Видаляємо фото з Cloudinary
+
         const deletePromises = images.map(image => {
             const publicId = extractPublicId(image.img);
             if (publicId) {
@@ -113,13 +77,12 @@ class ProductService {
             }
             return Promise.resolve();
         });
-    
+
         await Promise.all(deletePromises);
-    
-        // Видаляємо товар (всередині також видаляються картинки та характеристики)
+
         await product_repository.deleteProduct(id);
     }
-        async getAllProducts(query) {
+    async getAllProducts(query) {
         const { brandId, categoryId } = query;
         const limit = Number(query.limit) || 12;
         const page = Number(query.page) || 1;
@@ -137,7 +100,7 @@ class ProductService {
     }
     async getProduct(id) {
         try {
-            const product = await product_repository.getProduct(id);  // Викликаємо репозиторій для отримання продукту
+            const product = await product_repository.getProduct(id);
 
             if (!product) {
                 throw new Error("Товар не знайдено");
@@ -167,12 +130,15 @@ class ProductService {
             ...productFields
         } = data;
 
+        // Оновлюємо поля товару
         await product_repository.updateProductFields(id, productFields);
 
+        // Видаляємо старі зображення, якщо їх немає в новому списку
         if (oldImages) {
             const oldImgs = JSON.parse(oldImages);
             const currentImgs = await product_repository.getProductImages(id);
-        
+
+            // Видаляємо зображення з БД, яких більше немає
             for (const img of currentImgs) {
                 if (!oldImgs.find(o => o.img === img.img)) {
                     const publicId = extractPublicId(img.img);
@@ -186,30 +152,48 @@ class ProductService {
                     await product_repository.deleteProductImage(img.id);
                 }
             }
-        
+
+            // Оновлюємо статус головного фото для всіх зображень
             await product_repository.clearPreviewFlags(id);
+
+            // Оновлюємо головне фото
             const preview = oldImgs.find(img => img.isPreview);
             if (preview) {
-                await product_repository.setPreviewImage(preview.img);
+                const currentImgs = await product_repository.getProductImages(id);
+                const previewImage = currentImgs.find(img => img.img === preview.img);
+                if (previewImage) {
+                    await product_repository.setPreviewImageById(previewImage.id);
+                }
             }
         }
-        
 
+        // Додаємо нові зображення
         if (files?.images) {
             const imagesArray = Array.isArray(files.images) ? files.images : [files.images];
 
+            const previewFileIndex = Number(previewImageIndex) - (oldImages ? JSON.parse(oldImages).length : 0);
+
             for (let i = 0; i < imagesArray.length; i++) {
                 const file = imagesArray[i];
-                const uploaded = await uploadToCloudinary(file.data);
+                if (!file.mimetype.startsWith('image')) {
+                    throw new Error('Один із файлів не є зображенням');
+                }
 
+                const uploadResponse = await cloudinary.uploader.upload(file.tempFilePath, {
+                    folder: 'products',
+                });
+
+                const isPreview = i === previewFileIndex;
                 await product_repository.addProductImage({
                     productId: id,
-                    img: uploaded.secure_url,
-                    isPreview: Number(previewImageIndex) === i
+                    img: uploadResponse.secure_url,
+                    isPreview: isPreview
                 });
             }
         }
 
+
+        // Оновлюємо характеристики
         if (productFeatures) {
             const parsed = JSON.parse(productFeatures);
             await product_repository.replaceProductFeatures(id, parsed);
@@ -217,6 +201,7 @@ class ProductService {
 
         return product_repository.getProduct(id);
     }
+
     async searchProductByName(query) {
         const { name, limit = 12, page = 1 } = query
         const offset = page * limit - limit

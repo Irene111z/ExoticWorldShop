@@ -41,7 +41,7 @@ export const fetchBrands = async () => {
   };
 // Отримати всі товари
 export const fetchProducts = async (params = {}) => {
-    const { data } = await $host.get('api/product', { params }); // <-- важливо: { params }
+    const { data } = await $host.get('api/product', { params });
     return data;
 };
 // Отримати товар за ID

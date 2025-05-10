@@ -41,6 +41,7 @@ class ProductController {
         try {
             const { id } = req.params;
             const { body, files } = req;
+            console.log('req.files:', req.files)
             const product = await product_service.changeProduct(id, body, files);
             return res.status(200).json(product)
         } catch (error) {

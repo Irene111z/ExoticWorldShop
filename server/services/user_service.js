@@ -2,7 +2,6 @@ const user_repository = require('../repositories/user_repository')
 const cart_repository = require('../repositories/cart_repository')
 const { createJWT } = require('../utils/jwt')
 const { cloudinary } = require('../utils/cloudinary');
-const streamifier = require('streamifier');
 
 class UserService {
     async registerUser(data) {
@@ -33,7 +32,6 @@ class UserService {
         return await user_repository.getAllUsers()
     }
     async changeUserProfile(id, data, files) {
-        console.log("FILES:---------------------------------------------")
         console.log(files);
         const user = await user_repository.getUserById(id);
         if (!user) {
@@ -45,7 +43,7 @@ class UserService {
             if (files && files.img) {
                 const { img } = files;
                 if (img.mimetype.startsWith('image')) {
-                    // Завантаження на Cloudinary в папку users/custom
+                    // Завантаження на Cloudinary
                     const uploadResponse = await cloudinary.uploader.upload(img.tempFilePath, {
                         folder: 'users/custom',
                     });
@@ -56,12 +54,12 @@ class UserService {
             }
         } else if (files && files.img) {
             // Якщо аватар вже в папці custom, спочатку видаляємо старий
-            const publicId = user.img.split('/').pop().split('.')[0]; // Отримуємо public_id з URL
+            const publicId = user.img.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(`users/custom/${publicId}`);
 
             const { img } = files;
             if (img.mimetype.startsWith('image')) {
-                // Завантажуємо новий аватар на Cloudinary в папку users/custom
+                // Завантажуємо новий аватар на Cloudinary
                 const uploadResponse = await cloudinary.uploader.upload(img.tempFilePath, {
                     folder: 'users/custom',
                 });

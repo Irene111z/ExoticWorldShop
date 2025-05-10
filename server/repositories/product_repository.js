@@ -154,6 +154,12 @@ class ProductRepository {
     async hasUserReviewedProduct(userId, productId) {
         return await Review.findOne({ where: { userId, productId } })
     }
+    async setPreviewImageById(imageId) {
+    return await ProductImage.update(
+        { isPreview: true },
+        { where: { id: imageId } }
+    );
+}
 }
 
 module.exports = new ProductRepository()

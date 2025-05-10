@@ -107,7 +107,7 @@ const EditProduct = observer(() => {
   const handleDeleteProduct = async () => {
     const confirm = window.confirm("Ви впевнені, що хочете видалити цей товар? Цю дію неможливо скасувати.");
     if (!confirm) return;
-  
+
     try {
       await deleteProduct(id);
       alert("Товар успішно видалено!");
@@ -149,26 +149,27 @@ const EditProduct = observer(() => {
       formDataToSend.append('brandId', selectedBrand);
     }
 
-    // Додаємо нові зображення (якщо є)
-    let newImageIndex = 0;
-    images.forEach((image, index) => {
+    images.forEach((image) => {
       if (image.isNew !== false) {
         formDataToSend.append('images', image);
-        if (index === previewIndex) {
-          formDataToSend.append('previewImageIndex', String(newImageIndex));
-        }
-        newImageIndex++;
       }
     });
 
+    formDataToSend.append('previewImageIndex', String(previewIndex));
 
     // Додаємо старі зображення
     const oldImageUrls = images
       .filter((img) => img.isNew === false)
-      .map((img) => ({ img: img.img, isPreview: img.isPreview }));
+      .map((img, index) => ({
+        img: img.img,
+        isPreview: index === previewIndex
+      }));
+
 
     formDataToSend.append('oldImages', JSON.stringify(oldImageUrls));
-    console.log(formDataToSend);
+    
+    console.log("Preview index:", previewIndex);
+    console.log("Old images:", oldImageUrls);
     try {
       const response = await updateProduct(id, formDataToSend);
       console.log('Товар оновлено:', response);
@@ -179,18 +180,17 @@ const EditProduct = observer(() => {
   };
 
 
-
   return (
     <div className='container-fluid container-xxl mb-5'>
       <p className='mt-3 admin-products-title'>Створення товару</p>
       <form className='d-flex flex-column edit-product-form' onSubmit={handleSubmit}>
-      <button type="button"className="btn-delete-product mb-3"onClick={handleDeleteProduct}>Видалити товар</button>
+        <button type="button" className="btn-delete-product mb-3" onClick={handleDeleteProduct}>Видалити товар</button>
         <div className="d-flex flex-column mb-2">
           <label>Зображення товару</label>
           {images.length > 0 && (
             <div className="mt-2">
               {images.map((img, index) => {
-                const isNew = img.isNew !== false; // якщо не позначено як старе — нове
+                const isNew = img.isNew !== false;
                 const src = isNew ? URL.createObjectURL(img) : img.img;
 
                 return (

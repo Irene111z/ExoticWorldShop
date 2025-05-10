@@ -1,15 +1,24 @@
 import './Navbar.css';
 import { Link } from 'react-router-dom';
-import { HOMEPAGE_ROUTE, WISHLIST_ROUTE, PROFILE_ROUTE, BLOG_ROUTE, BOOKMARKS_ROUTE } from '../../utils/path';
-import { useContext, useState } from 'react';
+import { HOMEPAGE_ROUTE, WISHLIST_ROUTE, PROFILE_ROUTE, BLOG_ROUTE, BOOKMARKS_ROUTE, CATALOG_ROUTE } from '../../utils/path';
+import { useContext, useState, useEffect } from 'react';
 import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import AuthForm from '../AuthForm/AuthForm';
 import { useNavigate } from 'react-router-dom';
+import { fetchCategories } from '../../http/productAPI';
 
 const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        fetchCategories().then(data => {
+            const mainCats = data.filter(cat => cat.parentId === null && cat.level === 0);
+            setCategories(mainCats);
+        });
+    }, []);
 
     const openAuthModal = () => {
         setShowAuthModal(true);
@@ -90,10 +99,11 @@ const Navbar = observer(({ isHomePage }) => {
                 </div>
             </nav>
             <div className="header-cats text-uppercase d-flex flex-row justify-content-center py-1">
-                <p className='me-5 my-0'><Link to='/rodents' className='header-cat'>Гризунам</Link></p>
-                <p className='me-5 my-0'><Link to='/mammals' className='header-cat'>Ссавцям</Link></p>
-                <p className='me-5 my-0'><Link to='/reptiles' className='header-cat'>Рептиліям</Link></p>
-                <p className='my-0'><Link to='/birds' className='header-cat'>Птахам</Link></p>
+                {categories.map(cat => (
+                    <p key={cat.id} className='mx-4 my-0'>
+                        <Link to={`${CATALOG_ROUTE}/${cat.id}`} className="header-cat">{cat.name}</Link>
+                    </p>
+                ))}
             </div>
 
             {showAuthModal && <AuthForm onClose={closeAuthModal} />}

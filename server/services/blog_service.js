@@ -44,8 +44,6 @@ class BlogService {
 
         const { title, content, authorIds } = data;
 
-
-        // Оновлення заголовка посту
         if (title && title !== post.title) {
             const existingPost = await blog_repository.getPostByTitle(title);
             if (existingPost) {
@@ -54,46 +52,30 @@ class BlogService {
             post.title = title;
         }
 
-        // Оновлення контенту посту
         if (content !== undefined) {
             post.content = content;
         }
 
-        // Оновлення авторів
         if (authorIds && authorIds.length > 0) {
-            // Оновлюємо авторів посту
             await post.setAuthors(authorIds);
         }
 
-        // Якщо потрібно оновити зображення прев'ю
         if (previewFile) {
             // Видалення старого зображення з Cloudinary
             const publicId = post.preview.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(`posts/${publicId}`);
 
-            // Завантаження нового зображення на Cloudinary
-            const uploadStream = () => {
-                return new Promise((resolve, reject) => {
-                    const stream = cloudinary.uploader.upload_stream(
-                        {
-                            folder: 'posts',
-                            resource_type: 'image',
-                        },
-                        (error, result) => {
-                            if (error) reject(error);
-                            else resolve(result);
-                        }
-                    );
-                    streamifier.createReadStream(previewFile.data).pipe(stream);
+            if (previewFile.mimetype.startsWith('image')) {
+                // Завантаження нового зображення на Cloudinary
+                const uploadResponse = await cloudinary.uploader.upload(previewFile.tempFilePath, {
+                    folder: 'posts',
                 });
-            };
-
-            const result = await uploadStream();
-            // Оновлення URL прев'ю
-            post.preview = result.secure_url;
+                post.preview = uploadResponse.secure_url;
+            } else {
+                throw new Error('Файл не є зображенням');
+            }
         }
 
-        // Оновлення посту в базі даних
         await post.save();
         return post;
     }
@@ -104,13 +86,11 @@ class BlogService {
             throw new Error("Пост не знайдено");
         }
 
-        // Видалення зображення з Cloudinary
         if (post.preview) {
             const filename = post.preview.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(`posts/${filename}`);
         }
 
-        // Видалення поста з БД
         return await blog_repository.deletePost(post);
     }
 

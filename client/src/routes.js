@@ -62,7 +62,7 @@ export const publicRoutes = [
         Component: HomePage
     },
     {
-        path: path.CATALOG_ROUTE,
+        path: path.CATALOG_ROUTE + '/:categoryId',
         Component: Catalog
     },
     {
