@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: server
+          path: server/
 
   deploy:
     runs-on: ubuntu-latest
@@ -53,13 +53,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
+          path: extracted
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_81F12D0001374865AFC8E4CE50704C7F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4E8CB3BB193A4DDFABFD1E16B57847FD }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7131727DC5664AEF86419C6D528D2412 }}
+      - name: List files (debug)
+        run: ls -R extracted
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
@@ -67,4 +64,4 @@ jobs:
         with:
           app-name: 'exotic-world-server'
           slot-name: 'Production'
-          package: server
+          package: extracted
