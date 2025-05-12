@@ -212,7 +212,9 @@ class ProductService {
         if (!product) {
             throw new Error("Товар не знайдено")
         }
-        return await product_repository.getProductReviews(productId)
+        const reviews = await product_repository.getProductReviews(productId)
+        console.log(reviews)
+        return reviews
     }
     async createProductReview(userId, productId, data) {
         const product = await product_repository.getProduct(productId)

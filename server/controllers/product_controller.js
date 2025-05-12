@@ -72,11 +72,6 @@ class ProductController {
     async createProductReview(req, res, next) {
         try {
             await product_service.createProductReview(req.user.id, req.params.id, req.body)
-            console.log(req.user.id)
-            console.log(req.params.id)
-            console.log(req.body)
-            // const reviews = await product_service.getProductReviews(req.params.id)
-            // return res.status(200).json(reviews)
             return res.status(201).json({ message: 'Відгук успішно додано' });
         } catch (error) {
             next(ApiError.badRequest(error.message))

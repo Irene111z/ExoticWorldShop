@@ -13,7 +13,7 @@ const ProductPage = observer(() => {
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState('');
   const [categoryPath, setCategoryPath] = useState([]);
-  const { user } = useContext(Context);
+  const { user, setUser } = useContext(Context);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(0);
@@ -22,20 +22,34 @@ const ProductPage = observer(() => {
   const [reviews, setReviews] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
+  const [hasReviewed, setHasReviewed] = useState(false); // змінено на булеву змінну
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [data, allCategories] = await Promise.all([
-          fetchProductById(id),
-          fetchCategories(),
-        ]);
-
+        const [data, allCategories] = await Promise.all([fetchProductById(id), fetchCategories()]);
         setProduct(data);
         const similar = await fetchProducts({ categoryId: data.categoryId });
         const filtered = similar.rows.filter((item) => item.id !== data.id);
         setSimilarProducts(filtered);
         setActiveImage(data.images[0]?.img || '');
-        setReviews(data.reviews);  // Assuming reviews are part of the product data
+
+        // Отримуємо відгуки товару
+        const reviewsData = await fetchProductReviews(id);
+        setReviews(reviewsData.rows);
+
+        // Перевіряємо, чи користувач залишав відгук
+        const userReview = reviewsData.rows.find((review) => review.user.id === user.id);
+
+        console.log('All reviews:', reviewsData.rows);
+        console.log('User data:', user);
+        console.log(userReview)
+        if (userReview) {
+          setHasReviewed(true);
+        } else {
+          setHasReviewed(false);
+        }
+        console.log(hasReviewed)
 
         const buildCategoryPath = (id, categories, path = []) => {
           const category = categories.find((cat) => String(cat.id) === String(id));
@@ -55,7 +69,8 @@ const ProductPage = observer(() => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, user.id]);
+
 
   const handleSubmitReview = async () => {
     if (!rating) {
@@ -72,9 +87,11 @@ const ProductPage = observer(() => {
       };
       console.log("Надсилаємо відгук:", review);
       await addProductReview(product.id, review);
-      // Оновити список відгуків
-      const updatedReviews = await fetchProductReviews(product.id); // реалізуй за потреби
-      setReviews(updatedReviews);
+
+      // Додати новий відгук до списку відгуків
+      const updatedReviews = await fetchProductReviews(product.id);
+      setReviews(updatedReviews.rows);
+
       setRating(0);
       setReviewText('');
     } catch (e) {
@@ -213,50 +230,67 @@ const ProductPage = observer(() => {
             <div className="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
               <div className="d-flex flex-column">
                 {user.isAuth ? (
-                  <div className="review-form mt-3">
-                    <p className="mb-2">Ваш відгук:</p>
-                    <div className="d-flex mb-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <img
-                          key={star}
-                          src={star <= rating ? '/static/star-filled.svg' : '/static/star-empty.svg'}
-                          alt=""
-                          onClick={() => setRating(star)}
-                          style={{ cursor: 'pointer', width: '24px', marginRight: '5px' }}
-                        />
-                      ))}
+                  !hasReviewed ? ( // Якщо користувач ще не залишав відгук
+                    <div className="review-form mt-3">
+                      <p className="mb-2">Ваш відгук:</p>
+                      <div className="d-flex mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <img
+                            key={star}
+                            src={star <= rating ? '/static/star-filled.svg' : '/static/star-empty.svg'}
+                            alt=""
+                            onClick={() => setRating(star)}
+                            style={{ cursor: 'pointer', width: '24px', marginRight: '5px' }}
+                          />
+                        ))}
+                      </div>
+                      <textarea
+                        className="form-control textarea-review mb-2"
+                        rows="3"
+                        placeholder="Опишіть ваші враження про продукт."
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                      />
+                      <button className="btn-add-review" onClick={handleSubmitReview}>
+                        Надіслати відгук
+                      </button>
                     </div>
-                    <textarea
-                      className="form-control textarea-review mb-2"
-                      rows="3"
-                      placeholder="Опишіть ваші враження про продукт."
-                      value={reviewText}
-                      onChange={(e) => setReviewText(e.target.value)}
-                    />
-                    <button className="btn-add-review" onClick={handleSubmitReview}>
-                      Надіслати відгук
-                    </button>
-                  </div>
+                  ) : (
+                    <p>Ви вже залишили відгук для цього товару.</p>
+                  )
                 ) : (
                   <div>
                     Щоб залишити відгук, <span onClick={openAuthModal} style={{ color: '#2274A5', cursor: 'pointer' }}>увійдіть у профіль</span>.
                   </div>
                 )}
+                {/* Відгуки користувачів */}
                 <div className="existing-reviews mt-4">
-                  {reviews.length ? reviews.map((review) => (
-                    <div key={review.id} className="review-item mb-3">
-                      <div className="d-flex align-items-center mb-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
+                  {(reviews?.length || 0) > 0 ? reviews.map((review) => (
+                    <div key={review.id} className="d-flex flex-column mt-4">
+                      <hr className="mt-0" />
+                      <div className="d-flex justify-content-between">
+                        <div className="d-flex">
                           <img
-                            key={star}
-                            src={star <= review.rating ? '/static/star-filled.svg' : '/static/star-empty.svg'}
-                            alt=""
-                            style={{ width: '20px', marginRight: '3px' }}
+                            src={review.user?.img || '/static/review-img.png'}
+                            alt={review.user?.name || 'User'}
+                            className="review-person-img me-3"
                           />
-                        ))}
+                          <div className="mt-3">
+                            <p className="review-person-name mb-0">{review.user?.name} {review.user?.lastname}</p>
+                            <div className="rating-stars">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <img
+                                  key={star}
+                                  src={star <= review.rate ? '/static/star-filled.svg' : '/static/star-empty.svg'}
+                                  alt=""
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="mt-3">{new Date(review.createdAt).toLocaleDateString()}</p>
                       </div>
-                      <p className="mb-1">{review.text}</p>
-                      <small className="text-muted">Автор: {review.user?.name || 'Користувач'} | {new Date(review.createdAt).toLocaleDateString()}</small>
+                      <p className="mt-3">{review.comment}</p>
                     </div>
                   )) : <p className="mt-3">Ще немає відгуків.</p>}
                 </div>

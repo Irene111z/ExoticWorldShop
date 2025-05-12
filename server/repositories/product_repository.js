@@ -1,4 +1,4 @@
-const { Product, ProductFeatures, Category, Review, ProductImage } = require('../models/models')
+const { Product, ProductFeatures, Category, Review, ProductImage, User } = require('../models/models')
 const { Op } = require("sequelize");
 const sequelize = require('../database');
 
@@ -60,17 +60,17 @@ class ProductRepository {
 
     async deleteProduct(id) {
         const t = await sequelize.transaction();
-    
+
         try {
             // Видаляємо характеристики товару
             await ProductFeatures.destroy({ where: { productId: id }, transaction: t });
-    
+
             // Видаляємо записи зображень з БД
             await ProductImage.destroy({ where: { productId: id }, transaction: t });
-    
+
             // Видаляємо сам товар
             await Product.destroy({ where: { id }, transaction: t });
-    
+
             await t.commit();
         } catch (error) {
             await t.rollback();
@@ -122,7 +122,7 @@ class ProductRepository {
 
         return ids;
     }
-    
+
     async deleteProductImage(imageId) {
         const image = await ProductImage.findByPk(imageId);
         if (image) {
@@ -132,7 +132,13 @@ class ProductRepository {
     }
 
     async getProductReviews(productId) {
-        return await Review.findAndCountAll({ where: { productId } })
+        return await Review.findAndCountAll({
+            where: { productId },
+            include: [{
+                model: User,
+                attributes: ['id', 'name', 'lastname', 'img']
+            }]
+        });
     }
     async createProductReview(data) {
         return await Review.create(data)
@@ -155,11 +161,11 @@ class ProductRepository {
         return await Review.findOne({ where: { userId, productId } })
     }
     async setPreviewImageById(imageId) {
-    return await ProductImage.update(
-        { isPreview: true },
-        { where: { id: imageId } }
-    );
-}
+        return await ProductImage.update(
+            { isPreview: true },
+            { where: { id: imageId } }
+        );
+    }
 }
 
 module.exports = new ProductRepository()
