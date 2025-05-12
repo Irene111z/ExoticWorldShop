@@ -6,6 +6,11 @@ export const fetchCategories = async () => {
     const {data} = await $host.get('/api/category');
     return data;
 };
+// Отримати підкатегорії
+export const fetchSubcategories = async (parentId) => {
+    const { data } = await $host.get(`/api/category/${parentId}/subcategories`);
+    return data;
+};
 // Створити нову категорію
 export const createCategory = async (category) => {
     const {data} = await $authHost.post('/api/category', category);

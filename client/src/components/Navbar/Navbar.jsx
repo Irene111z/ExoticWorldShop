@@ -5,20 +5,103 @@ import { useContext, useState, useEffect } from 'react';
 import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import AuthForm from '../AuthForm/AuthForm';
-import { useNavigate } from 'react-router-dom';
 import { fetchCategories } from '../../http/productAPI';
+
+// const CategoryItem = ({ category }) => {
+//     return (
+//         <div className="nav-category-wrapper">
+//             <Link to={`${CATALOG_ROUTE}/${category.id}`} className="header-cat">
+//                 {category.name}
+//             </Link>
+//             {category.subcategories.length > 0 && (
+//                 <div className="nav-subcategories">
+//                     {category.subcategories.map(sub => (
+//                         <CategoryItem key={sub.id} category={sub} />
+//                     ))}
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
+const chunkArray = (array, chunkSize) => {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+        chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
+};
+
+const MegaMenu = ({ category }) => {
+    const columns = chunkArray(category.subcategories, Math.ceil(category.subcategories.length / 4));
+
+    return (
+        <div className="mega-menu-container">
+            <div className="mega-menu-wrapper container-xxl">
+                <div className="mega-menu limited-columns">
+                    {columns.map((group, colIdx) => (
+                        <div className="mega-menu-group" key={colIdx}>
+                            {group.map(sub => (
+                                <div key={sub.id}>
+                                    <Link to={`${CATALOG_ROUTE}/${sub.id}`} className="mega-menu-title">
+                                        {sub.name}
+                                    </Link>
+                                    {sub.subcategories?.length > 0 && (
+                                        <div className="mega-menu-sublist">
+                                            {sub.subcategories.map(child => (
+                                                <Link
+                                                    key={child.id}
+                                                    to={`${CATALOG_ROUTE}/${child.id}`}
+                                                    className="mega-menu-subitem"
+                                                >
+                                                    {child.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [categories, setCategories] = useState([]);
 
+    function buildCategoryTree(categories) {
+        const map = {};
+        const roots = [];
+
+        categories.forEach(cat => {
+            map[cat.id] = { ...cat, subcategories: [] };
+        });
+
+        categories.forEach(cat => {
+            if (cat.parentId === null) {
+                roots.push(map[cat.id]);
+            } else if (map[cat.parentId]) {
+                map[cat.parentId].subcategories.push(map[cat.id]);
+            }
+        });
+
+        return roots;
+    }
+
+
     useEffect(() => {
         fetchCategories().then(data => {
-            const mainCats = data.filter(cat => cat.parentId === null && cat.level === 0);
-            setCategories(mainCats);
+            const tree = buildCategoryTree(data);
+            setCategories(tree);
         });
     }, []);
+
+
 
     const openAuthModal = () => {
         setShowAuthModal(true);
@@ -98,11 +181,23 @@ const Navbar = observer(({ isHomePage }) => {
                     </div>
                 </div>
             </nav>
-            <div className="header-cats text-uppercase d-flex flex-row justify-content-center py-1">
+            {/* <div className="header-cats text-uppercase d-flex flex-row justify-content-center py-1">
                 {categories.map(cat => (
-                    <p key={cat.id} className='mx-4 my-0'>
-                        <Link to={`${CATALOG_ROUTE}/${cat.id}`} className="header-cat">{cat.name}</Link>
-                    </p>
+                    <CategoryItem key={cat.id} category={cat} />
+                ))}
+            </div> */}
+            <div className="header-cats d-flex flex-row justify-content-center py-1">
+                {categories.map(cat => (
+                    <div className="nav-category-wrapper mx-4" key={cat.id}>
+                        <Link to={`${CATALOG_ROUTE}/${cat.id}`} className="header-cat text-uppercase">
+                            {cat.name}
+                        </Link>
+                        {cat.subcategories.length > 0 && (
+                            <div className="mega-menu-container">
+                                <MegaMenu category={cat} />
+                            </div>
+                        )}
+                    </div>
                 ))}
             </div>
 
