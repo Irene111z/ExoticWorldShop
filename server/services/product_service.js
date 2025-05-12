@@ -201,7 +201,6 @@ class ProductService {
 
         return product_repository.getProduct(id);
     }
-
     async searchProductByName(query) {
         const { name, limit = 12, page = 1 } = query
         const offset = page * limit - limit
@@ -209,14 +208,15 @@ class ProductService {
 
     }
     async getProductReviews(productId) {
-        const product = await product_repository.getProductById(productId)
+        const product = await product_repository.getProduct(productId)
         if (!product) {
             throw new Error("Товар не знайдено")
         }
         return await product_repository.getProductReviews(productId)
     }
     async createProductReview(userId, productId, data) {
-        const product = await product_repository.getProductById(productId)
+        const product = await product_repository.getProduct(productId)
+        console.log(data);
         if (!product) {
             throw new Error("Товар не знайдено")
         }

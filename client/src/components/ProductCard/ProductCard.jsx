@@ -11,7 +11,12 @@ const ProductCard = ({ product }) => {
         <div className="d-flex flex-column">
           <p style={{ color: "#858585", fontSize: '14px' }} className='mb-1'>Код: {product.id}</p>
           <div className="d-flex flex-column align-items-center">
-            <img className="d-flex product-card-img" src={product.images?.find(img => img.isPreview)?.img} alt="..." onClick={() => navigate(`${PRODUCT_ROUTE}/${product.id}`)} />
+            <img
+              className={`d-flex product-card-img ${product.quantity === 0 ? 'img-out-of-stock' : ''}`}
+              src={product.images?.find(img => img.isPreview)?.img}
+              alt="..."
+              onClick={() => navigate(`${PRODUCT_ROUTE}/${product.id}`)}
+            />
             <div className='d-flex product-card-rating d-flex mt-1'>
               <img src='/static/star-filled.svg' alt="" />
               <img src='/static/star-filled.svg' alt="" />
@@ -23,27 +28,32 @@ const ProductCard = ({ product }) => {
           </div>
         </div>
         <div className="d-flex flex-row justify-content-between">
-          <div className="d-flex flex-column product-card-price">
+          <div className="d-flex flex-column">
             <div className="d-flex me-0 align-items-end" style={{ fontSize: '12px' }}>
-              <p className='text-uppercase me-2 my-0' style={{ color: '#FF7A00', fontWeight: '700', fontSize: '16px' }}>Ціна</p>
-              {product.disc_price ? (
-                <p className="text-decoration-line-through product-card-old-price my-0" style={{ color: '#5F6368' }}>
-                  {Number(product.disc_price).toFixed(2).includes(".00")
-                    ? Math.round(product.disc_price)
-                    : product.disc_price.toFixed(2)} ₴
-                </p>
-              ) : (<span></span>)}
+              <p className={product.quantity > 0 ? 'text-uppercase me-2 my-0 product-card-price' : 'text-uppercase me-2 my-0 product-card-price-disabled'}>Ціна</p>
+              {product.disc_price ?
+                (
+                  <p className="product-card-old-price my-0">
+                    {Number(product.disc_price).toFixed(2).includes(".00")
+                      ? Math.round(product.disc_price)
+                      : product.disc_price.toFixed(2)} ₴
+                  </p>
+                )
+                :
+                (<span></span>)}
             </div>
-            <p className="my-0" style={{ color: '#FF7A00', fontWeight: '700', fontSize: '16px' }}>
+            <p className={product.quantity > 0 ? "my-0 product-card-price" : "my-0 product-card-price-disabled"}>
               {Number(product.price).toFixed(2).includes(".00")
                 ? Math.round(product.price)
                 : product.price.toFixed(2)} ₴
             </p>
           </div>
           <div className="d-flex product-card-btns">
-            <img src='/static/wishlist-empty.svg' alt="" className='me-0' />
-            {/* <button onClick={()=>{addToCart(product.id)}} className="product-card-btn-add-to-cart"><img src='/static/cart-empty.svg' alt="" /></button> */}
-            <button className="product-card-btn-add-to-cart"><img src='/static/cart-empty.svg' alt="" /></button>
+            <button className="product-card-btn-add-to-cart"><img src={product.quantity > 0 ? '/static/wishlist-empty.svg' : '/static/wishlist-empty-gray.svg'} alt="" className='me-0' /></button>
+            {product.quantity > 0 ?
+              (<button className="product-card-btn-add-to-cart" ><img src='/static/cart-empty.svg' alt="" /></button>)
+              :
+              (<button className="product-card-btn-add-to-cart" disabled><img src='/static/cart-empty-gray.svg' alt="" /></button>)}
           </div>
         </div>
       </div>

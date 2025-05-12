@@ -76,6 +76,8 @@ export const fetchProductReviews = async (productId) => {
 };
 // Додати відгук до товару
 export const addProductReview = async (productId, review) => {
+    console.log("Отримані дані від фронтенду:", review);
+    console.log("productId", productId);
     const { data } = await $authHost.post(`/api/product/${productId}/reviews`, review);
     return data;
 };

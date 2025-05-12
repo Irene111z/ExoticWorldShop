@@ -13,7 +13,7 @@ import Blog from './pages/Blog';
 import OrderPage from './pages/OrderPage';
 import Catalog from './pages/Catalog/Catalog';
 import PostPage from './pages/PostPage/PostPage';
-import ProductPage from './pages/ProductPage';
+import ProductPage from './pages/ProductPage/ProductPage';
 import UserProfile from './pages/UserProfile/UserProfile';
 import * as path from '../src/utils/path'
 
