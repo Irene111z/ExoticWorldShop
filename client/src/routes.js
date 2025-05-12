@@ -11,7 +11,7 @@ import Bookmarks from './pages/Bookmarks';
 import HomePage from './pages/HomePage';
 import Blog from './pages/Blog';
 import OrderPage from './pages/OrderPage';
-import Catalog from './pages/Catalog';
+import Catalog from './pages/Catalog/Catalog';
 import PostPage from './pages/PostPage/PostPage';
 import ProductPage from './pages/ProductPage';
 import UserProfile from './pages/UserProfile/UserProfile';
