@@ -37,7 +37,23 @@ class ProductRepository {
             ]
         });
     }
-
+    async getProductsByIds(ids) {
+        return await Product.findAll({
+            where: { id: { [Op.in]: ids } },
+            include: [
+                {
+                    model: ProductImage,
+                    as: 'images',
+                    required: false
+                },
+                {
+                    model: Review,
+                    attributes: ['rate'],
+                    required: false
+                }
+            ]
+        });
+    }
     async getProduct(id) {
         return await Product.findOne({
             where: { id },

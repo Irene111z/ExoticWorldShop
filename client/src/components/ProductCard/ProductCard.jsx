@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import './ProductCard.css'
 import { useNavigate } from "react-router-dom";
 import { PRODUCT_ROUTE } from '../../utils/path'
+import { addProductToWishlist, deleteProductFromWishlist } from '../../http/productAPI';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist }) => {
   const navigate = useNavigate();
+
+  const [isInWishlist, setIsInWishlist] = useState(wishlistIds.includes(product.id));
+  console.log("wishlist ids ", wishlistIds)
+
+  useEffect(() => {
+    setIsInWishlist(wishlistIds.includes(product.id));
+  }, [wishlistIds, product.id]);
+
+  const handleToggleWishlist = async () => {
+    try {
+      if (isInWishlist) {
+        await deleteProductFromWishlist(product.id);
+        setIsInWishlist(false);
+        if (onRemoveFromWishlist) {
+          onRemoveFromWishlist(product.id);
+        }
+      } else {
+        await addProductToWishlist(product.id);
+        setIsInWishlist(true);
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Помилка при оновленні списку бажаного');
+    }
+  };
+
   return (
     <div className="col mb-4 product-card">
       <div className="d-flex flex-column justify-content-between product-card-content">
@@ -56,7 +82,16 @@ const ProductCard = ({ product }) => {
             </p>
           </div>
           <div className="d-flex product-card-btns">
-            <button className="product-card-btn-add-to-cart"><img src={product.quantity > 0 ? '/static/wishlist-empty.svg' : '/static/wishlist-empty-gray.svg'} alt="" className='me-0' /></button>
+            <button className="product-card-btn-add-to-cart" onClick={handleToggleWishlist}><img
+              src={
+                product.quantity > 0
+                  ? (isInWishlist ? '/static/wishlist-filled.svg' : '/static/wishlist-empty.svg')
+                  : (isInWishlist ? '/static/wishlist-filled-gray.svg' : '/static/wishlist-empty-gray.svg')
+              }
+
+              alt=""
+              className='me-0'
+            /></button>
             {product.quantity > 0 ?
               (<button className="product-card-btn-add-to-cart" ><img src='/static/cart-empty.svg' alt="" /></button>)
               :

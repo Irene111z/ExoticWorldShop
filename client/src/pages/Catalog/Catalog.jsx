@@ -1,16 +1,29 @@
 import { Link, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { fetchProducts, fetchCategories } from '../../http/productAPI';
+import { useContext, useEffect, useState } from 'react';
+import { fetchProducts, fetchCategories, fetchWishlist } from '../../http/productAPI';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { CATALOG_ROUTE, HOMEPAGE_ROUTE } from '../../utils/path';
 import './Catalog.css'
+import { Context } from '../..';
 
 const CategoryProductsPage = () => {
+  const {user} = useContext(Context)
   const { categoryId } = useParams();
   const [products, setProducts] = useState([]);
   const [categoryPath, setCategoryPath] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistIds, setWishlistIds] = useState([]);
+
+  useEffect(() => {
+    if (user?.isAuth) {
+      fetchWishlist().then(items => {
+        setWishlistIds(items.rows.map(item => item.productId));
+      }).catch(() => setWishlistIds([]));
+    } else {
+      setWishlistIds([]);
+    }
+  }, [user]);
 
   useEffect(() => {
     setLoading(true);
@@ -80,7 +93,7 @@ const CategoryProductsPage = () => {
       <div className="row row-cols-1 row-cols-xxl-5 row-cols-xl-4 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 g-4">
         {products.length > 0 ? (
           products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} wishlistIds={wishlistIds}/>
           ))
         ) : (
           <p>На жаль, дана категорія не містить товарів.</p>

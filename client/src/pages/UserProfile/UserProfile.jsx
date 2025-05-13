@@ -102,7 +102,7 @@ const UserProfile = () => {
     <div className="container-fluid container-xxl">
       <div className="d-flex flex-column">
         <form onSubmit={handleSubmit} className='user-profile-form mt-4'>
-          <div className="d-flex mb-3 flex-row-reverse">
+          <div className="d-flex mb-3 flex-row-reverse user-profile-icons">
             <img src="/static/edit-icon-white.svg" alt="" className='edit-profile-icon' onClick={() => setIsEditing(true)}/>
             <img src="/static/log-out-icon.svg" className='edit-profile-icon me-3' alt="" onClick={()=>logout()}/>
           </div>

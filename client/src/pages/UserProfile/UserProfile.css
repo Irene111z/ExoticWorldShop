@@ -67,3 +67,9 @@
   color: #fff;
   font-size: 16px;
 }
+.user-profile-icons img{
+  cursor: pointer;
+}
+.user-profile-icons img:hover{
+  scale: 1.05;
+}

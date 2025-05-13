@@ -5,16 +5,13 @@ class WishlistService{
         return await wishlist_repository.getWishlistProducts(userId)
     }
     async addProduct(userId, productId){
-        await wishlist_repository.addProduct(userId, productId)
-        return await wishlist_repository.getWishlistProducts(userId)
+        return await wishlist_repository.addProduct(userId, productId)
     }
     async removeProduct(userId, productId){
-        await wishlist_repository.removeProduct(userId, productId)
-        return await wishlist_repository.getWishlistProducts(userId)
+        return await wishlist_repository.removeProduct(userId, productId)
     }
     async clearWishlist(userId){
-        await wishlist_repository.clearWishlist(userId)
-        return await wishlist_repository.getWishlistProducts(userId)
+        return await wishlist_repository.clearWishlist(userId)
     }
 }
 

@@ -6,7 +6,7 @@ import PostsManagement from './pages/PostsManagement/PostsManagement'
 import CreatePost from './pages/PostsManagement/CreatePost'
 import EditPost from './pages/PostsManagement/EditPost'
 import CategoriesManagement from './pages/CategoriesManagement/CategoriesManagement'
-import Wishlist from './pages/Wishlist';
+import Wishlist from './pages/Wishlist/Wishlist';
 import Bookmarks from './pages/Bookmarks';
 import HomePage from './pages/HomePage';
 import Blog from './pages/Blog';

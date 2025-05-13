@@ -116,6 +116,23 @@ class ProductService {
             rows: enrichedProducts
         };
     }
+    async getProductsByIds(ids) {
+        const products = await product_repository.getProductsByIds(ids);
+
+        return products.map(product => {
+            const reviews = product.reviews || [];
+            const ratings = reviews.map(r => r.rate);
+            const avgRating = ratings.length
+                ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+                : 0;
+
+            return {
+                ...product.toJSON(),
+                averageRating: parseFloat(avgRating.toFixed(2)),
+            };
+        });
+    }
+
     async getProduct(id) {
         try {
             const product = await product_repository.getProduct(id);

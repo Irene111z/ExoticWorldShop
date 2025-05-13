@@ -5,8 +5,8 @@ import { observer } from 'mobx-react-lite';
 import './ProductPage.css';
 import AuthForm from '../../components/AuthForm/AuthForm';
 import ProductCard from '../../components/ProductCard/ProductCard';
-import { fetchProductById, fetchCategories, fetchProducts, addProductReview, fetchProductReviews } from '../../http/productAPI';
-import { HOMEPAGE_ROUTE, CATALOG_ROUTE } from '../../utils/path';
+import { fetchProductById, fetchCategories, fetchProducts, addProductReview, fetchProductReviews, fetchWishlist, addProductToWishlist, deleteProductFromWishlist } from '../../http/productAPI';
+import { HOMEPAGE_ROUTE, CATALOG_ROUTE, PRODUCT_ROUTE } from '../../utils/path';
 
 const ProductPage = observer(() => {
   const { id } = useParams();
@@ -23,12 +23,26 @@ const ProductPage = observer(() => {
   const [showReviewForm, setShowReviewForm] = useState(true);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [hasReviewed, setHasReviewed] = useState(false);
+  const [inWishlist, setInWishlist] = useState(false);
+  const [wishlistIds, setWishlistIds] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [data, allCategories] = await Promise.all([fetchProductById(id), fetchCategories()]);
         setProduct(data);
+        if (user?.isAuth) {
+          fetchWishlist()
+            .then(items => {
+              const ids = items.rows.map(item => item.productId);
+              setWishlistIds(ids);
+              setInWishlist(ids.includes(data.id));
+            })
+            .catch(err => {
+              console.error("Помилка при отриманні вішліста", err);
+              setInWishlist(false);
+            });
+        }
         const similar = await fetchProducts({ categoryId: data.categoryId });
         const filtered = similar.rows.filter((item) => item.id !== data.id);
         setSimilarProducts(filtered);
@@ -40,8 +54,6 @@ const ProductPage = observer(() => {
         // Перевіряємо, чи користувач залишав відгук
         const userReview = reviewsData.rows.find((review) => review.user.id === user.userId);
 
-        console.log('All reviews:', reviewsData.rows);
-        console.log('User data:', user.userId);
         console.log(userReview)
         if (userReview) {
           setHasReviewed(true);
@@ -101,9 +113,32 @@ const ProductPage = observer(() => {
     }
   };
 
+  const handleWishlistToggle = async () => {
+    if (!user.isAuth) {
+      handleProtectedClick(`${PRODUCT_ROUTE}/${product.id}`);
+      return;
+    }
+
+    try {
+      if (inWishlist) {
+        await deleteProductFromWishlist(product.id);
+        setInWishlist(false);
+      } else {
+        await addProductToWishlist(product.id);
+        setInWishlist(true);
+      }
+    } catch (err) {
+      console.error('Помилка з вішлістом:', err);
+    }
+  };
 
   const openAuthModal = () => setShowAuthModal(true);
   const closeAuthModal = () => setShowAuthModal(false);
+
+  const handleProtectedClick = (redirectPath) => {
+    localStorage.setItem('redirectUrl', redirectPath);
+    openAuthModal();
+  };
 
   if (!product) return <div>Завантаження...</div>;
 
@@ -167,7 +202,12 @@ const ProductPage = observer(() => {
           {product.quantity > 0 ? <p className='product-availible mb-2'>В наявності</p> : <p className='product-not-availible mb-2'>Немає в наявності</p>}
           <div className="d-flex mb-2">
             {product.quantity > 0 ? (<button className="btn-add-to-cart me-3">Купити</button>) : (<button className="btn-add-to-cart-disabled me-3" disabled>Купити</button>)}
-            <img src='/static/product-page-wishlist.svg' alt="" />
+            <img
+              src={inWishlist ? '/static/wishlist-filled.svg' : '/static/wishlist-empty.svg'}
+              alt="wishlist"
+              style={{ cursor: 'pointer' }}
+              onClick={handleWishlistToggle}
+            />
           </div>
           <hr className='my-2' />
           <p className='product-delivery-title mb-2'>Доставка</p>
@@ -256,7 +296,7 @@ const ProductPage = observer(() => {
                   </div>
                 ) : !user.isAuth ? (
                   <div>
-                    Щоб залишити відгук, <span onClick={openAuthModal} style={{ color: '#2274A5', cursor: 'pointer' }}>увійдіть у профіль</span>.
+                    Щоб залишити відгук, <span onClick={() => handleProtectedClick(`${PRODUCT_ROUTE}/${product.id}`)} style={{ color: '#2274A5', cursor: 'pointer' }}>увійдіть у профіль</span>.
                   </div>
                 ) : (
                   <p className="mt-3 mb-0">Ви вже залишили відгук для цього товару.</p>
@@ -298,14 +338,14 @@ const ProductPage = observer(() => {
             <div className="tab-pane fade" id="similar" role="tabpanel" aria-labelledby="similar-tab">
               <div className="d-flex flex-wrap justify-content-between mt-4">
                 {similarProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} wishlistIds={wishlistIds}/>
                 ))}
               </div>
             </div>
           </div>
         </div>
       </div>
-      {showAuthModal && <AuthForm show={showAuthModal} handleClose={closeAuthModal} />}
+      {showAuthModal && <AuthForm show={showAuthModal} onClose={closeAuthModal} />}
     </div>
   );
 });

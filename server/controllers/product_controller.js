@@ -27,6 +27,19 @@ class ProductController {
             next(ApiError.badRequest(error.message))
         }
     }
+    async getProductsByIds(req, res, next) {
+        try {
+            const { ids } = req.body;
+
+            if (!Array.isArray(ids) || ids.length === 0) {
+                return res.status(400).json({ message: 'Невірний список ID' });
+            }
+            const products = await product_service.getProductsByIds(ids);
+            return res.json(products);
+        } catch (error) {
+            next(ApiError.badRequest(error.message))
+        }
+    }
 
     async getProduct(req, res, next) {
         try {
