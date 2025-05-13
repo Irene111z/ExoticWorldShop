@@ -13,15 +13,15 @@ const ProductPage = observer(() => {
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState('');
   const [categoryPath, setCategoryPath] = useState([]);
-  const { user, setUser } = useContext(Context);
+  const { user } = useContext(Context);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(true);
   const [similarProducts, setSimilarProducts] = useState([]);
-
   const [hasReviewed, setHasReviewed] = useState(false);
 
   useEffect(() => {
@@ -38,10 +38,10 @@ const ProductPage = observer(() => {
         setReviews(reviewsData.rows);
 
         // Перевіряємо, чи користувач залишав відгук
-        const userReview = reviewsData.rows.find((review) => review.user.id === user.id);
+        const userReview = reviewsData.rows.find((review) => review.user.id === user.userId);
 
         console.log('All reviews:', reviewsData.rows);
-        console.log('User data:', user);
+        console.log('User data:', user.userId);
         console.log(userReview)
         if (userReview) {
           setHasReviewed(true);
@@ -70,7 +70,6 @@ const ProductPage = observer(() => {
     fetchData();
   }, [id, user.id]);
 
-
   const handleSubmitReview = async () => {
     if (!rating) {
       setError("Оцінка обов'язкова");
@@ -84,12 +83,14 @@ const ProductPage = observer(() => {
         rate: rating,
         comment: reviewText
       };
-      console.log("Надсилаємо відгук:", review);
       await addProductReview(product.id, review);
 
       // Додати новий відгук до списку відгуків
       const updatedReviews = await fetchProductReviews(product.id);
       setReviews(updatedReviews.rows);
+
+      // Приховати форму відгуку після надсилання
+      setShowReviewForm(false);
 
       setRating(0);
       setReviewText('');
@@ -99,6 +100,7 @@ const ProductPage = observer(() => {
       setSubmitting(false);
     }
   };
+
 
   const openAuthModal = () => setShowAuthModal(true);
   const closeAuthModal = () => setShowAuthModal(false);
@@ -227,42 +229,41 @@ const ProductPage = observer(() => {
             </div>
             <div className="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
               <div className="d-flex flex-column">
-                {user.isAuth ? (
-                  !hasReviewed ? ( // Якщо користувач ще не залишав відгук
-                    <div className="review-form mt-3">
-                      <p className="mb-2">Ваш відгук:</p>
-                      <div className="d-flex mb-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <img
-                            key={star}
-                            src={star <= rating ? '/static/star-filled.svg' : '/static/star-empty.svg'}
-                            alt=""
-                            onClick={() => setRating(star)}
-                            style={{ cursor: 'pointer', width: '24px', marginRight: '5px' }}
-                          />
-                        ))}
-                      </div>
-                      <textarea
-                        className="form-control textarea-review mb-2"
-                        rows="3"
-                        placeholder="Опишіть ваші враження про продукт."
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                      />
-                      <button className="btn-add-review" onClick={handleSubmitReview}>
-                        Надіслати відгук
-                      </button>
+                {user.isAuth && !hasReviewed && showReviewForm ? (
+                  <div className="review-form mt-3">
+                    <p className="mb-2">Ваш відгук:</p>
+                    <div className="d-flex mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <img
+                          key={star}
+                          src={star <= rating ? '/static/star-filled.svg' : '/static/star-empty.svg'}
+                          alt=""
+                          onClick={() => setRating(star)}
+                          style={{ cursor: 'pointer', width: '24px', marginRight: '5px' }}
+                        />
+                      ))}
                     </div>
-                  ) : (
-                    <p>Ви вже залишили відгук для цього товару.</p>
-                  )
-                ) : (
+                    <textarea
+                      className="form-control textarea-review mb-2"
+                      rows="3"
+                      placeholder="Опишіть ваші враження про продукт."
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                    />
+                    <button className="btn-add-review" onClick={handleSubmitReview}>
+                      Надіслати відгук
+                    </button>
+                  </div>
+                ) : !user.isAuth ? (
                   <div>
                     Щоб залишити відгук, <span onClick={openAuthModal} style={{ color: '#2274A5', cursor: 'pointer' }}>увійдіть у профіль</span>.
                   </div>
+                ) : (
+                  <p className="mt-3 mb-0">Ви вже залишили відгук для цього товару.</p>
                 )}
+
                 {/* Відгуки користувачів */}
-                <div className="existing-reviews mt-4">
+                <div className="existing-reviews">
                   {(reviews?.length || 0) > 0 ? reviews.map((review) => (
                     <div key={review.id} className="d-flex flex-column mt-4">
                       <hr className="mt-0" />
@@ -290,7 +291,7 @@ const ProductPage = observer(() => {
                       </div>
                       <p className="mt-3">{review.comment}</p>
                     </div>
-                  )) : <p className="mt-3">Ще немає відгуків.</p>}
+                  )) : <p className="mt-3">На цей товар ще ніхто не залишив відгук. Станьте першим, хто це зробить!</p>}
                 </div>
               </div>
             </div>

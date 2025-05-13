@@ -31,4 +31,7 @@ export default class UserContext{
     get user(){
         return this._user
     }
+    get userId() {
+        return this._user?.id
+    }
 }
