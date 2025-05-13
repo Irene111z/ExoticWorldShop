@@ -18,11 +18,18 @@ const ProductCard = ({ product }) => {
               onClick={() => navigate(`${PRODUCT_ROUTE}/${product.id}`)}
             />
             <div className='d-flex product-card-rating d-flex mt-1'>
-              <img src='/static/star-filled.svg' alt="" />
-              <img src='/static/star-filled.svg' alt="" />
-              <img src='/static/star-filled.svg' alt="" />
-              <img src='/static/star-filled.svg' alt="" />
-              <img src='/static/star-filled.svg' alt="" />
+              {[...Array(5)].map((_, idx) => (
+                <img
+                  key={idx}
+                  src={
+                    idx < Math.round(Number(product.averageRating || 0))
+
+                      ? '/static/star-filled.svg'
+                      : '/static/star-empty.svg'
+                  }
+                  alt="Зірка"
+                />
+              ))}
             </div>
             <p className="product-card-name mt-2 mb-0" onClick={() => navigate(`${PRODUCT_ROUTE}/${product.id}`)}>{product.name}</p>
           </div>

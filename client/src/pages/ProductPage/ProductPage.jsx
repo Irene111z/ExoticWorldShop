@@ -22,7 +22,7 @@ const ProductPage = observer(() => {
   const [reviews, setReviews] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
-  const [hasReviewed, setHasReviewed] = useState(false); // змінено на булеву змінну
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,7 +34,6 @@ const ProductPage = observer(() => {
         setSimilarProducts(filtered);
         setActiveImage(data.images[0]?.img || '');
 
-        // Отримуємо відгуки товару
         const reviewsData = await fetchProductReviews(id);
         setReviews(reviewsData.rows);
 
@@ -100,7 +99,6 @@ const ProductPage = observer(() => {
       setSubmitting(false);
     }
   };
-
 
   const openAuthModal = () => setShowAuthModal(true);
   const closeAuthModal = () => setShowAuthModal(false);

@@ -58,8 +58,6 @@ class ProductController {
         }
     }
 
-
-
     async getProductReviews(req, res, next) {
         try {
             const reviews = await product_service.getProductReviews(req.params.id)

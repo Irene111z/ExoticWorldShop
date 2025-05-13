@@ -28,10 +28,16 @@ class ProductRepository {
                     model: ProductImage,
                     as: 'images',
                     required: false
+                },
+                {
+                    model: Review,
+                    attributes: ['rate'],
+                    required: false
                 }
             ]
         });
     }
+
     async getProduct(id) {
         return await Product.findOne({
             where: { id },

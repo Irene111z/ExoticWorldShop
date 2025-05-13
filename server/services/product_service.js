@@ -86,17 +86,35 @@ class ProductService {
         const { brandId, categoryId } = query;
         const limit = Number(query.limit) || 12;
         const page = Number(query.page) || 1;
-        const offset = page * limit - limit
+        const offset = page * limit - limit;
 
         let filter = {};
-        if (brandId) filter.brandId = brandId
+        if (brandId) filter.brandId = brandId;
 
         if (categoryId) {
             const subcategoryIds = await product_repository.getSubcategories(categoryId);
-            filter.categoryId = { [Op.in]: [categoryId, ...subcategoryIds] }
+            filter.categoryId = { [Op.in]: [categoryId, ...subcategoryIds] };
         }
 
-        return await product_repository.getAllProducts(filter, limit, offset)
+        const result = await product_repository.getAllProducts(filter, limit, offset);
+
+        const enrichedProducts = result.rows.map(product => {
+            const reviews = product.reviews || [];
+            const ratings = reviews.map(r => r.rate);
+            const avgRating = ratings.length
+                ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+                : 0;
+
+            return {
+                ...product.toJSON(),
+                averageRating: parseFloat(avgRating.toFixed(2)),
+            };
+        });
+
+        return {
+            count: result.count,
+            rows: enrichedProducts
+        };
     }
     async getProduct(id) {
         try {
