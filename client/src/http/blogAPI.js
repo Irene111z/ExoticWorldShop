@@ -32,32 +32,50 @@ export const deletePost = async (id) => {
   return data;
 };
 
+// АВТОРИ
 // Отримати всіх авторів
 export const fetchAuthors = async () => {
-    const { data } = await $host.get('/api/author');
-    return data;
-  };
-  
+  const { data } = await $host.get('/api/author');
+  return data;
+};
+
 // Створити нового автора
-  export const createAuthor = async (authorData) => {
-    const { data } = await $authHost.post('/api/author', authorData);
-    return data;
-  };
-  
-  // Оновити інформацію про автора
-  export const updateAuthor = async (id, authorData) => {
-    const { data } = await $authHost.put(`/api/author/${id}`, authorData);
-    return data;
-  };
-  
-  // Видалити автора
-  export const deleteAuthor = async (id) => {
-    const { data } = await $authHost.delete(`/api/author/${id}`);
-    return data;
-  };
-  
-  // Отримати автора за id
-  export const fetchAuthorById = async (id) => {
-    const { data } = await $host.get(`/api/author/${id}`);
-    return data;
-  };
+export const createAuthor = async (authorData) => {
+  const { data } = await $authHost.post('/api/author', authorData);
+  return data;
+};
+
+// Оновити інформацію про автора
+export const updateAuthor = async (id, authorData) => {
+  const { data } = await $authHost.put(`/api/author/${id}`, authorData);
+  return data;
+};
+
+// Видалити автора
+export const deleteAuthor = async (id) => {
+  const { data } = await $authHost.delete(`/api/author/${id}`);
+  return data;
+};
+
+// Отримати автора за id
+export const fetchAuthorById = async (id) => {
+  const { data } = await $host.get(`/api/author/${id}`);
+  return data;
+};
+
+//ЗБЕРЕЖЕНІ СТАТТІ
+// Зберегти статтю
+export const addPostToBookmarks = async (postId) => {
+  const { data } = await $authHost.post(`/api/bookmarks/post`, { postId });
+  return data;
+};
+// Видалити статтю зі збереженого
+export const deletePostFromBookmarks = async (postId) => {
+  const { data } = await $authHost.delete(`/api/bookmarks/post/${postId}`);
+  return data;
+}
+// Отримати збережені статті
+export const fetchBookmarks = async () => {
+  const { data } = await $authHost.get(`/api/bookmarks`);
+  return data;
+}

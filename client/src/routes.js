@@ -7,9 +7,9 @@ import CreatePost from './pages/PostsManagement/CreatePost'
 import EditPost from './pages/PostsManagement/EditPost'
 import CategoriesManagement from './pages/CategoriesManagement/CategoriesManagement'
 import Wishlist from './pages/Wishlist/Wishlist';
-import Bookmarks from './pages/Bookmarks';
+import Bookmarks from './pages/Bookmarks/Bookmarks';
 import HomePage from './pages/HomePage';
-import Blog from './pages/Blog';
+import Blog from './pages/Blog/Blog';
 import OrderPage from './pages/OrderPage';
 import Catalog from './pages/Catalog/Catalog';
 import PostPage from './pages/PostPage/PostPage';

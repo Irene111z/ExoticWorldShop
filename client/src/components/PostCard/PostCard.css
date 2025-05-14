@@ -1,6 +1,5 @@
 .post-card {
     border: none;
-    cursor: pointer;
     transition: transform 0.3s ease;
     background-color: #fff;
     padding: 0;
@@ -8,30 +7,40 @@
     overflow: hidden;
 }
 
+.save-post-btn {
+    width: 30px;
+    cursor: pointer;
+}
+
 .post-card-img-wrapper {
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+}
+
+.post-card-body {
+    height: 130px;
 }
 
 .post-card-title {
     color: #546C42;
     font-weight: 600;
     font-size: 20px;
-    border-bottom: 1px solid transparent;
+    cursor: pointer;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    line-height: normal;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
-.post-card-title:hover{
-    border-bottom: 1px solid #546C42;
-    transition: border-bottom 0.5s ease;
-}
-.btn-view-post{
-    border: none;
-    border-radius: 100px;
-    background-color: #FF7A00;
-    color: #fff;
-    padding: 5px 15px;
-}
-.btn-view-post:hover{
-    scale: 1.025;
+
+.post-card-title:hover {
+    text-decoration-line: underline;
+    text-decoration-color: #546C42;
+    text-decoration-thickness: 1px;
     transition: all 0.3s ease;
 }
 
@@ -44,10 +53,4 @@
 
 .post-card:hover .post-card-img {
     transform: scale(1.05);
-}
-
-.blog-title {
-    font-family: 28px;
-    font-weight: 600;
-    color: #fff;
 }

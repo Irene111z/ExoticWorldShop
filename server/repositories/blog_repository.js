@@ -59,7 +59,7 @@ class BlogRepository {
         try {
             const post = await Post.findOne({
                 where: { id },
-                attributes: ['title', 'preview', 'content', 'createdAt'],
+                attributes: ['id', 'title', 'preview', 'content', 'createdAt'],
                 include: [{
                     model: Author,
                     attributes: ['id', 'name', 'lastname', 'occupation', 'workplace', 'sity'],

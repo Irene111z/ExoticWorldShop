@@ -24,8 +24,8 @@ class BookmarksController{
             if (!postId) {
                 return next(ApiError.badRequest("Пост не знайдено"));
             }
-            const bookmarks = await bookmarks_service.addBookmark(userId, postId)
-            return res.status(200).json(bookmarks)
+            await bookmarks_service.addBookmark(userId, postId)
+            return res.status(200).json("Пост було успішно збережено")
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
         }
@@ -40,8 +40,8 @@ class BookmarksController{
             if (!postId) {
                 return next(ApiError.badRequest("Пост не знайдено"));
             }
-            const bookmarks = await bookmarks_service.removeBookmark(userId, postId)
-            return res.status(200).json(bookmarks)
+            await bookmarks_service.removeBookmark(userId, postId)
+            return res.status(200).json("Пост видалено зі збережених")
         } catch (error) {
             next(ApiError.badRequest(error.message)) 
         }
