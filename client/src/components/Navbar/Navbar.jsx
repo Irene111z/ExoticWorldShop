@@ -1,11 +1,12 @@
 import './Navbar.css';
 import { Link } from 'react-router-dom';
 import { HOMEPAGE_ROUTE, WISHLIST_ROUTE, PROFILE_ROUTE, BLOG_ROUTE, BOOKMARKS_ROUTE, CATALOG_ROUTE } from '../../utils/path';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import AuthForm from '../AuthForm/AuthForm';
 import { fetchCategories } from '../../http/productAPI';
+import CartModal from '../CartModal/CartModal';
 
 // const CategoryItem = ({ category }) => {
 //     return (
@@ -68,7 +69,6 @@ const MegaMenu = ({ category }) => {
     );
 };
 
-
 const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -92,8 +92,6 @@ const Navbar = observer(({ isHomePage }) => {
 
         return roots;
     }
-
-
     useEffect(() => {
         fetchCategories().then(data => {
             const tree = buildCategoryTree(data);
@@ -101,20 +99,18 @@ const Navbar = observer(({ isHomePage }) => {
         });
     }, []);
 
-
-
     const openAuthModal = () => {
         setShowAuthModal(true);
     };
-
     const closeAuthModal = () => {
         setShowAuthModal(false);
     };
-
     const handleProtectedClick = (redirectPath) => {
         localStorage.setItem('redirectUrl', redirectPath);
         openAuthModal();
     };
+
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     return (
         <header className={`${isHomePage ? 'transparent-header' : 'header'}`}>
@@ -171,13 +167,20 @@ const Navbar = observer(({ isHomePage }) => {
                     </div>
                     <div className="d-flex flex-column">
                         <div className="header-cart-count">2</div>
-                        <img
-                            src="/static/navbar-cart.svg"
-                            className='text-center py-0'
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal"
-                            alt=""
-                        />
+                        {user.isAuth ? (
+                            <img
+                                src="/static/navbar-cart.svg"
+                                className='text-center py-0'
+                                alt=""
+                                onClick={() => setIsCartOpen(true)}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        ) : (
+                            <div className='me-4' onClick={() => handleProtectedClick(HOMEPAGE_ROUTE)}>
+                                <img src="/static/navbar-cart.svg" alt="" />
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </nav>
@@ -200,7 +203,7 @@ const Navbar = observer(({ isHomePage }) => {
                     </div>
                 ))}
             </div>
-
+            <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
             {showAuthModal && <AuthForm onClose={closeAuthModal} />}
         </header>
     );

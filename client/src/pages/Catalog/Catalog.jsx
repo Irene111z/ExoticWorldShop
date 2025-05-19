@@ -1,19 +1,20 @@
 import { Link, useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
-import { fetchProducts, fetchCategories, fetchWishlist } from '../../http/productAPI';
+import { fetchProducts, fetchCategories, fetchWishlist, fetchCart } from '../../http/productAPI';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { CATALOG_ROUTE, HOMEPAGE_ROUTE } from '../../utils/path';
 import './Catalog.css'
 import { Context } from '../..';
 
-const CategoryProductsPage = () => {
-  const {user} = useContext(Context)
+const Catalog = () => {
+  const { user } = useContext(Context)
   const { categoryId } = useParams();
   const [products, setProducts] = useState([]);
   const [categoryPath, setCategoryPath] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [wishlistIds, setWishlistIds] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     if (user?.isAuth) {
@@ -22,6 +23,16 @@ const CategoryProductsPage = () => {
       }).catch(() => setWishlistIds([]));
     } else {
       setWishlistIds([]);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.isAuth) {
+      fetchCart().then(data => {
+        setCartItems(data?.cart_items || []);
+      }).catch(() => setCartItems([]));
+    } else {
+      setCartItems([]);
     }
   }, [user]);
 
@@ -38,7 +49,10 @@ const CategoryProductsPage = () => {
 
         const products = productData.rows || [];
         if (Array.isArray(products)) {
-          setProducts(products);
+          const sortedProducts = [...products]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .sort((a, b) => (b.quantity > 0 ? 1 : -1) - (a.quantity > 0 ? 1 : -1));
+          setProducts(sortedProducts);
         } else {
           setError('Щось пішло не так з товарами.');
         }
@@ -93,7 +107,7 @@ const CategoryProductsPage = () => {
       <div className="row row-cols-1 row-cols-xxl-5 row-cols-xl-4 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 g-4">
         {products.length > 0 ? (
           products.map((product) => (
-            <ProductCard key={product.id} product={product} wishlistIds={wishlistIds}/>
+            <ProductCard key={product.id} product={product} wishlistIds={wishlistIds} cartItems={cartItems} />
           ))
         ) : (
           <p>На жаль, дана категорія не містить товарів.</p>
@@ -103,4 +117,4 @@ const CategoryProductsPage = () => {
   );
 };
 
-export default CategoryProductsPage;
+export default Catalog;

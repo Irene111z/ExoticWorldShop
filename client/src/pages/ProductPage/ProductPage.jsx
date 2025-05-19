@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import './ProductPage.css';
 import AuthForm from '../../components/AuthForm/AuthForm';
 import ProductCard from '../../components/ProductCard/ProductCard';
-import { fetchProductById, fetchCategories, fetchProducts, addProductReview, fetchProductReviews, fetchWishlist, addProductToWishlist, deleteProductFromWishlist } from '../../http/productAPI';
+import { fetchProductById, fetchCategories, fetchProducts, addProductReview, fetchProductReviews, fetchWishlist, addProductToWishlist, deleteProductFromWishlist, addProductToCart, fetchCart } from '../../http/productAPI';
 import { HOMEPAGE_ROUTE, CATALOG_ROUTE, PRODUCT_ROUTE } from '../../utils/path';
 
 const ProductPage = observer(() => {
@@ -25,6 +25,9 @@ const ProductPage = observer(() => {
   const [hasReviewed, setHasReviewed] = useState(false);
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistIds, setWishlistIds] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
+  const [quantityInCart, setQuantityInCart] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +53,17 @@ const ProductPage = observer(() => {
 
         const reviewsData = await fetchProductReviews(id);
         setReviews(reviewsData.rows);
-
+        if (user?.isAuth) {
+          try {
+            const cartData = await fetchCart();
+            console.log("cart data", cartData)
+            setCartItems(cartData.cart_items || []);
+            const itemInCart = cartData.cart_items.find(item => item.productId === data.id);
+            setQuantityInCart(itemInCart ? itemInCart.quantity : 0);
+          } catch (error) {
+            console.error('Помилка при отриманні кошика', error);
+          }
+        }
         // Перевіряємо, чи користувач залишав відгук
         const userReview = reviewsData.rows.find((review) => review.user.id === user.userId);
 
@@ -131,6 +144,34 @@ const ProductPage = observer(() => {
       console.error('Помилка з вішлістом:', err);
     }
   };
+  const availableQuantity = product && product.quantity ? product.quantity - quantityInCart : 0;
+  const handleQuantityChange = (e) => {
+    const val = Number(e.target.value);
+    if (availableQuantity <= 0) {
+      setQuantity(0);
+    } else if (val < 1) {
+      setQuantity(1);
+    } else if (val > availableQuantity) {
+      setQuantity(availableQuantity);
+    } else {
+      setQuantity(val);
+    }
+  };
+  const handleAddToCart = async () => {
+    try {
+      await addProductToCart(product.id, quantity);
+
+      const cartData = await fetchCart();
+      const items = Array.isArray(cartData?.cart_items) ? cartData.cart_items : [];
+      setCartItems(items);
+
+      const itemInCart = items.find(item => item.productId === product.id);
+      setQuantityInCart(itemInCart?.quantity || 0);
+      setQuantity(1);
+    } catch {
+      alert('Не вдалося додати товар до кошика');
+    }
+  };
 
   const openAuthModal = () => setShowAuthModal(true);
   const closeAuthModal = () => setShowAuthModal(false);
@@ -201,7 +242,31 @@ const ProductPage = observer(() => {
           <hr className='my-2' />
           {product.quantity > 0 ? <p className='product-availible mb-2'>В наявності</p> : <p className='product-not-availible mb-2'>Немає в наявності</p>}
           <div className="d-flex mb-2">
-            {product.quantity > 0 ? (<button className="btn-add-to-cart me-3">Купити</button>) : (<button className="btn-add-to-cart-disabled me-3" disabled>Купити</button>)}
+            {product && (
+              <>
+                <input
+                  type="number"
+                  min={availableQuantity > 0 ? 1 : 0}
+                  max={availableQuantity}
+                  value={availableQuantity > 0 ? quantity : 0}
+                  onChange={handleQuantityChange}
+                  className="form-control me-2"
+                  style={{ width: '70px' }}
+                  disabled={availableQuantity <= 0}
+                />
+                {product.quantity > 0 && availableQuantity > 0 ? (
+                  <div className="d-flex flex-column">
+                    <button className="btn-add-to-cart me-3" onClick={handleAddToCart}>
+                      Купити
+                    </button>
+                  </div>
+                ) : (
+                  <button className="btn-add-to-cart-disabled me-3" disabled>
+                    Купити
+                  </button>
+                )}
+              </>
+            )}
             <img
               src={inWishlist ? '/static/wishlist-filled.svg' : '/static/wishlist-empty.svg'}
               alt="wishlist"
@@ -209,6 +274,9 @@ const ProductPage = observer(() => {
               onClick={handleWishlistToggle}
             />
           </div>
+          {availableQuantity <= 0 && (
+            <small className="text-danger mb-2">Ви вже додали  до кошика максимальну кількість товару, що є на складі</small>
+          )}
           <hr className='my-2' />
           <p className='product-delivery-title mb-2'>Доставка</p>
           <div className="d-flex flex-column mb-3">
@@ -338,7 +406,7 @@ const ProductPage = observer(() => {
             <div className="tab-pane fade" id="similar" role="tabpanel" aria-labelledby="similar-tab">
               <div className="d-flex flex-wrap justify-content-between mt-4">
                 {similarProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} wishlistIds={wishlistIds}/>
+                  <ProductCard key={product.id} product={product} wishlistIds={wishlistIds} />
                 ))}
               </div>
             </div>

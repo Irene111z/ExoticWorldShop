@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react'
 import './ProductCard.css'
 import { useNavigate } from "react-router-dom";
 import { PRODUCT_ROUTE } from '../../utils/path'
-import { addProductToWishlist, deleteProductFromWishlist } from '../../http/productAPI';
+import { addProductToWishlist, deleteProductFromWishlist, addProductToCart } from '../../http/productAPI';
 
-const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist }) => {
+const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist, cartItems = [] }) => {
+
   const navigate = useNavigate();
 
   const [isInWishlist, setIsInWishlist] = useState(wishlistIds.includes(product.id));
-  console.log("wishlist ids ", wishlistIds)
+  const isInCart = cartItems?.some(item => item.productId === product.id);
 
   useEffect(() => {
     setIsInWishlist(wishlistIds.includes(product.id));
@@ -28,6 +29,14 @@ const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist }) => {
       }
     } catch (error) {
       alert(error.response?.data?.message || 'Помилка при оновленні списку бажаного');
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      await addProductToCart(product.id);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Помилка при додаванні в кошик');
     }
   };
 
@@ -93,7 +102,7 @@ const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist }) => {
               className='me-0'
             /></button>
             {product.quantity > 0 ?
-              (<button className="product-card-btn-add-to-cart" ><img src='/static/cart-empty.svg' alt="" /></button>)
+              (<button className="product-card-btn-add-to-cart" onClick={handleAddToCart}><img src={isInCart ? '/static/cart-filled.svg' : '/static/cart-empty.svg'} alt="" /></button>)
               :
               (<button className="product-card-btn-add-to-cart" disabled><img src='/static/cart-empty-gray.svg' alt="" /></button>)}
           </div>

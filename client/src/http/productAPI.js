@@ -110,3 +110,35 @@ export const deleteProductFromWishlist = async (productId) => {
     const { data } = await $authHost.delete(`/api/wishlist/product/${productId}`);
     return data;
 }
+
+//КОШИК
+// Отримати усі товари у кошику
+export const fetchCart = async () => {
+  const { data } = await $authHost.get(`/api/cart`);
+  return data;
+};
+// Додати товар у кошик
+export const addProductToCart = async (productId, quantity = 1) => {
+  const { data } = await $authHost.post(`/api/cart/item`, { productId, quantity });
+  return data;
+};
+// Збільшити кількість одиниць товару
+export const increaseCartItem = async (productId) => {
+  const { data } = await $authHost.put(`/api/cart/incItem`, { productId });
+  return data;
+};
+// Зменшити кількість одиниць товару
+export const decreaseCartItem = async (productId) => {
+  const { data } = await $authHost.put(`/api/cart/decItem`, { productId });
+  return data;
+};
+// Видалити товар з кошика
+export const deleteProductFromCart = async (productId) => {
+  const { data } = await $authHost.delete(`/api/cart/item/${productId}`);
+  return data;
+};
+// Очистити кошик
+export const clearCart = async () => {
+  const { data } = await $authHost.delete(`/api/cart`);
+  return data;
+};
