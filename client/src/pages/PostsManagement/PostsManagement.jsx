@@ -10,7 +10,7 @@ const PostsManagement = () => {
     <div className='container-fluid container-xxl posts-page'>
       <p className='posts-title mt-3'>Статті</p>
       <div className="d-flex justify-content-between">
-        <input type="text" placeholder='Пошук' className='search-post-admin' />
+        <input type="text" placeholder='Пошук' className='search-post-admin' hidden/>
         <button className='add-post-link' onClick={() => navigate(`${CREATE_POST_ROUTE}`)}>Створити статтю</button>
       </div>
       <PostsList/>

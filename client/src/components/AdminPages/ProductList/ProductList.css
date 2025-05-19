@@ -1,5 +1,7 @@
 .product-list-img{
-    max-width: 90px;
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
 }
 .product-edit-icon{
     max-width: 20px;

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchPostById, updatePost, deletePost, fetchAuthors, createAuthor } from '../../http/blogAPI';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
+import {POSTS_MANAGEMENT_ROUTE} from '../../utils/path'
 
 const EditPost = () => {
   const { id } = useParams();
@@ -37,7 +38,7 @@ const EditPost = () => {
       try {
         await deletePost(id);
         alert('Статтю успішно видалено.');
-        navigate('/blog'); // або інший маршрут на список постів
+        navigate({POSTS_MANAGEMENT_ROUTE});
       } catch (error) {
         console.error('Помилка при видаленні поста:', error);
         alert('Не вдалося видалити статтю.');

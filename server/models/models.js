@@ -81,7 +81,7 @@ const Category = sequelize.define(
     'category',
     {
         id:{type:DataTypes.INTEGER, unique:true, primaryKey:true, autoIncrement:true},
-        name:{type:DataTypes.STRING, allowNull: false, unique:true},
+        name:{type:DataTypes.STRING, allowNull: false},
         parentId:{
             type:DataTypes.INTEGER,
             allowNull: true,

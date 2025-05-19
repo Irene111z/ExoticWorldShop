@@ -3,24 +3,29 @@ const category_repository = require('../repositories/category_repository')
 class CategoryService {
     async createCategory(data) {
         const { name, parentId } = data;
+        console.log('Отримані дані для створення:', data);
+
+        // Явно перетворюємо parentId у число або null
+        const parsedParentId = parentId ? parseInt(parentId, 10) : null;
 
         let parentCategory = null;
 
-        if (parentId) {
-            parentCategory = await category_repository.getCategoryById(parentId);
+        if (parsedParentId !== null) {
+            parentCategory = await category_repository.getCategoryById(parsedParentId);
+            if (!parentCategory) {
+                throw new Error(`Батьківську категорію з id=${parsedParentId} не знайдено`);
+            }
         }
 
-        let level = 0;
-        if (parentCategory) {
-            level = parentCategory.level + 1;
-        }
+        const level = parentCategory ? parentCategory.level + 1 : 0;
 
         return category_repository.addCategory({
             name,
-            parentId: parentCategory ? parentCategory.id : null,
+            parentId: parsedParentId,
             level,
         });
     }
+
 
     async deleteCategory(id) {
         const category = await category_repository.getCategoryById(id);

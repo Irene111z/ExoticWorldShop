@@ -58,7 +58,7 @@ const PostsList = () => {
                                     alt=""
                                     className="card-img-top"
                                 />
-                                <div className="card-body">
+                                <div className="card-body d-flex flex-column justify-content-between">
                                     <h5 className="card-title">{post.title}</h5>
                                     <div className="d-flex justify-content-between align-items-end">
                                         <small className="text-muted">{new Date(post.createdAt).toLocaleDateString()}</small>

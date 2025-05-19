@@ -10,32 +10,19 @@ class BlogService {
         }
 
         const { preview } = files;
-        if (!preview) {
+        if (!preview || !preview.tempFilePath) {
             throw new Error("Фото попереднього перегляду обов'язкове");
         }
 
-        // Завантаження preview-зображення на Cloudinary
-        const uploadStream = () => {
-            return new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    {
-                        folder: 'posts',
-                        resource_type: 'image'
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
-                streamifier.createReadStream(preview.data).pipe(stream);
-            });
-        };
-
-        const result = await uploadStream();
+        // Завантаження preview-зображення на Cloudinary через tempFilePath
+        const uploadResponse = await cloudinary.uploader.upload(preview.tempFilePath, {
+            folder: 'posts',
+        });
 
         // Створення посту
-        return await blog_repository.createPost(title, result.secure_url, content, authorIds);
+        return await blog_repository.createPost(title, uploadResponse.secure_url, content, authorIds);
     }
+
     async editPost(id, data, previewFile) {
         const post = await blog_repository.getPostById(id);
         if (!post) {

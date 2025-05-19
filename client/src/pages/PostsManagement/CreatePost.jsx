@@ -108,6 +108,10 @@ const CreatePost = () => {
     formDataToSend.append('preview', formData.preview);
     selectedAuthors.forEach(author => formDataToSend.append('authorIds', author.id));
 
+    console.log('📤 Дані, що відправляються на бекенд:');
+for (let pair of formDataToSend.entries()) {
+  console.log(pair[0] + ':', pair[1]);
+}
     try {
       await createPost(formDataToSend);
       alert('Пост успішно створено!');
@@ -168,7 +172,7 @@ const CreatePost = () => {
 
             {isCreatingNewAuthor && (
               <div className="d-flex flex-column mt-3 create-author-form">
-                <h4>Новий автор</h4>
+                <h6>Новий автор</h6>
                 <input name="name" className="mb-2" placeholder="Ім’я" value={newAuthor.name} onChange={handleNewAuthorChange} />
                 <input name="lastname" className="mb-2" placeholder="Прізвище" value={newAuthor.lastname} onChange={handleNewAuthorChange} />
                 <input name="occupation" className="mb-2" placeholder="Професія" value={newAuthor.occupation} onChange={handleNewAuthorChange} />

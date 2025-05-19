@@ -1,6 +1,9 @@
 .post-card{
 
 }
+.card-body{
+    height: 130px;
+}
 .post-card-img{
     width: 100%;
 }

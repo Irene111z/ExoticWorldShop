@@ -294,7 +294,7 @@ const CreateProduct = observer(() => {
             <input
               type="text"
               placeholder='Характеристика'
-              className='me-4'
+              className='me-2'
               value={newFeature.name}
               onChange={(e) => setNewFeature({ ...newFeature, name: e.target.value })}
             />
@@ -304,10 +304,9 @@ const CreateProduct = observer(() => {
               value={newFeature.description}
               onChange={(e) => setNewFeature({ ...newFeature, description: e.target.value })}
             />
-          </div>
-          <button
+            <button
             type="button"
-            className='add-product-feature-btn'
+            className='add-product-feature-btn ms-2'
             onClick={() => {
               if (newFeature.name.trim() && newFeature.description.trim()) {
                 setFeatures([...features, { ...newFeature, id: Date.now() }]);
@@ -315,8 +314,9 @@ const CreateProduct = observer(() => {
               }
             }}
           >
-            Додати характеристику
+            +
           </button>
+          </div>
         </div>
 
         <div className="d-flex flex-column mb-2 ">

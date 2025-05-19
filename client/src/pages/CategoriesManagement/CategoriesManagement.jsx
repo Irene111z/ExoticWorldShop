@@ -31,12 +31,18 @@ const CategoriesManagement = observer(() => {
     loadCategories();
   }, []);
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
+const handleCreate = async (e) => {
+  e.preventDefault();
+  console.log("Створення категорії з даними:", newCategory); // <-- лог
+  try {
     await createCategory(newCategory);
     setNewCategory({ name: "", parentId: null });
     loadCategories();
-  };
+  } catch (error) {
+    console.error("Помилка при створенні категорії:", error); // <-- лог помилки
+  }
+};
+
 
   const handleUpdate = async (e) => {
     e.preventDefault();
