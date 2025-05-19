@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import './CartModal.css';
+import { Link } from 'react-router-dom';
 import { fetchCart, increaseCartItem, decreaseCartItem, deleteProductFromCart } from '../../http/productAPI'
+import { PRODUCT_ROUTE } from '../../utils/path';
 
 const CartModal = ({ isOpen, onClose }) => {
     const [cartItems, setCartItems] = useState([]);
@@ -79,13 +81,20 @@ const CartModal = ({ isOpen, onClose }) => {
                         {cartItems.length === 0 && <p>Кошик порожній</p>}
                         {cartItems.map(({ id, quantity, product }) => (
                             <div key={id} className="cart-item d-flex flex-column py-2">
-                                <p className='mb-1 cart-item-name'>{product.name}</p>
+                                <Link
+                                    to={PRODUCT_ROUTE + '/' + product.id}
+                                    onClick={onClose}
+                                    className="mb-1 cart-item-name"
+                                    style={{ textDecoration: 'none', color: 'inherit' }}
+                                >
+                                    {product.name}
+                                </Link>
                                 <div className="d-flex py-2 align-items-center">
-                                    <img
+                                    <Link to={PRODUCT_ROUTE + '/' + product.id} onClick={onClose}><img
                                         src={product.images?.[0]?.img || "/static/home-img2.png"}
                                         className="cart-item-img me-5"
                                         alt={product.name}
-                                    />
+                                    /></Link>
                                     <div className="d-flex justify-content-between w-100">
                                         <div className="d-flex cart-item-quantity d-flex align-items-center">
                                             <button
@@ -112,7 +121,7 @@ const CartModal = ({ isOpen, onClose }) => {
                                                 (
                                                     <p className='cart-item-sale-price mb-0 me-3'>{(Number(product.price).toFixed(2).replace(/\.00$/, '')) * quantity} грн.</p>
                                                 )}
-                                            <img src="/static/delete-icon.svg" className="delete-cart-item-btn me-2" alt="" onClick={() => handleDelete(product.id)}/>
+                                            <img src="/static/delete-icon.svg" className="delete-cart-item-btn me-2" alt="" onClick={() => handleDelete(product.id)} />
                                         </div>
                                     </div>
                                 </div>
