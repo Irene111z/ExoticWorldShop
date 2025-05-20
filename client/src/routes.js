@@ -10,7 +10,7 @@ import Wishlist from './pages/Wishlist/Wishlist';
 import Bookmarks from './pages/Bookmarks/Bookmarks';
 import HomePage from './pages/HomePage';
 import Blog from './pages/Blog/Blog';
-import OrderPage from './pages/OrderPage';
+import OrderPage from './pages/OrderPage/OrderPage';
 import Catalog from './pages/Catalog/Catalog';
 import PostPage from './pages/PostPage/PostPage';
 import ProductPage from './pages/ProductPage/ProductPage';

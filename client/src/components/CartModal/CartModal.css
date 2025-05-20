@@ -27,6 +27,8 @@
     border: none;
     border-radius: 5px;
     color: #fff;
+    text-align: center;
+    text-decoration: none;
 }
 .btn-go-to-order-form{
     background-color: #546C42;

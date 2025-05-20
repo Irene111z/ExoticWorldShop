@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './CartModal.css';
 import { Link } from 'react-router-dom';
 import { fetchCart, increaseCartItem, decreaseCartItem, deleteProductFromCart } from '../../http/productAPI'
-import { PRODUCT_ROUTE } from '../../utils/path';
+import { PRODUCT_ROUTE, ORDER_ROUTE } from '../../utils/path';
 
 const CartModal = ({ isOpen, onClose }) => {
     const [cartItems, setCartItems] = useState([]);
@@ -91,7 +91,7 @@ const CartModal = ({ isOpen, onClose }) => {
                                 </Link>
                                 <div className="d-flex py-2 align-items-center">
                                     <Link to={PRODUCT_ROUTE + '/' + product.id} onClick={onClose}><img
-                                        src={product.images?.[0]?.img || "/static/home-img2.png"}
+                                        src={product.images?.[0]?.img}
                                         className="cart-item-img me-5"
                                         alt={product.name}
                                     /></Link>
@@ -133,7 +133,13 @@ const CartModal = ({ isOpen, onClose }) => {
                     <p className='text-end'>Усього товарів на суму: {totalPrice.toFixed(2).replace(/\.00$/, '')} грн.</p>
                     <div className="d-flex">
                         <button className="btn-continue-shopping me-4" onClick={onClose}>Продовжити покупки</button>
-                        <button className="btn-go-to-order-form">Оформити замовлення</button>
+                        <Link
+                            to={ORDER_ROUTE}
+                            className="btn-go-to-order-form"
+                            onClick={onClose}
+                        >
+                            Оформити замовлення
+                        </Link>
                     </div>
                 </div>
             </div>
