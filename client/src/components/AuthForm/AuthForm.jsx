@@ -5,6 +5,7 @@ import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ORDERS_MANAGEMENT_ROUTE } from '../../utils/path';
 import { registration, login, fetchDefaultAvatars } from '../../http/userAPI';
+import InputMask from "react-input-mask";
 
 const AuthForm = observer(({ onClose }) => {
 
@@ -41,22 +42,22 @@ const AuthForm = observer(({ onClose }) => {
     }, []);
 
     const signIn = async (e) => {
-    e.preventDefault();
-    if (!randomAvatar) {
-        console.warn('Аватар ще не готовий!');
-        return;
-    }
-    const img = randomAvatar;
-    console.log('Random avatar:', img);
-
-    const data = await registration(email, password, name, lastname, phone, img);
-    user.setUser(user);
-    user.setIsAuth(true);
-    onClose();
-    const redirectUrl = localStorage.getItem('redirectUrl') || '/';
-    navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
-    localStorage.removeItem('redirectUrl');
-};
+        e.preventDefault();
+        if (!randomAvatar) {
+            console.warn('Аватар ще не готовий!');
+            return;
+        }
+        const img = randomAvatar;
+        const cleanedPhone = phone.replace(/[^\d+]/g, '');
+        console.log("phone", cleanedPhone)
+        const data = await registration(email, password, name, lastname, cleanedPhone, img);
+        user.setUser(user);
+        user.setIsAuth(true);
+        onClose();
+        const redirectUrl = localStorage.getItem('redirectUrl') || '/';
+        navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
+        localStorage.removeItem('redirectUrl');
+    };
 
 
     const logIn = async (e) => {
@@ -102,7 +103,12 @@ const AuthForm = observer(({ onClose }) => {
                             <h2 className='auth-form-title'>Реєстрація</h2>
                             <input type="text" className="auth-form-input" placeholder="Прізвище" value={lastname} onChange={e => setLastname(e.target.value)} />
                             <input type="text" className="auth-form-input" placeholder="Ім'я" value={name} onChange={e => setName(e.target.value)} />
-                            <input type="text" className="auth-form-input" placeholder="Номер тел." value={phone} onChange={e => setPhone(e.target.value)} />
+                            <InputMask
+                                mask="+38 099-999-99-99"
+                                className="auth-form-input"
+                                placeholder="+38 0XX-XXX-XX-XX"
+                                value={phone} onChange={e => setPhone(e.target.value)}
+                            />
                             <input type="email" className="auth-form-input" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                             <div className="password-container d-flex justify-content-between">
                                 <input type={passwordShown ? "text" : "password"} placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} />

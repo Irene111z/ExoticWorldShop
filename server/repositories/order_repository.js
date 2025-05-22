@@ -1,5 +1,5 @@
 const { model } = require('../database')
-const { Product, Order, OrderItem, CartItem, Cart } = require('../models/models')
+const { Product, Order, OrderItem, CartItem, Cart, ProductImage } = require('../models/models')
 
 class OrderRepository {
     async createOrderFromCart(userId, data) {
@@ -60,7 +60,6 @@ class OrderRepository {
     async getUserOrders(userId) {
         const orders = await Order.findAll({
             where: { userId },
-            attributes: ['id', 'total', 'createdAt', 'status'],
             include: [
                 {
                     model: OrderItem,
@@ -68,18 +67,30 @@ class OrderRepository {
                     include: [
                         {
                             model: Product,
-                            attributes: ['name', 'price', 'disc_price', 'img']
+                            attributes: ['name', 'price', 'disc_price'],
+                            include: [
+                                {
+                                    model: ProductImage,
+                                    as: 'images',
+                                    attributes: ['img'],
+                                    where: { isPreview: true },
+                                    required: false
+                                }
+                            ]
                         }
                     ]
-                }],
+                }
+            ],
             order: [['createdAt', 'DESC']]
-        })
+        });
 
         if (!orders) {
-            throw new Error("Ваша історія замовлень поки пуста.")
+            throw new Error("Ваша історія замовлень поки пуста.");
         }
-        return orders
+
+        return orders;
     }
+
     async cancelOrder(userId, orderId) {
         const order = await Order.findOne({ where: { userId: userId, id: orderId } })
         if (!order) {
@@ -92,7 +103,6 @@ class OrderRepository {
     }
     async getAllOrders() {
         const orders = await Order.findAll({
-            attributes: ['id', 'total', 'createdAt', 'status', 'delivery_method', 'delivery_address', 'payment_method', 'recipient_name', 'recipient_lastname', 'recipient_phone', 'recipient_email', 'comment'],
             include: [
                 {
                     model: OrderItem,
@@ -100,7 +110,16 @@ class OrderRepository {
                     include: [
                         {
                             model: Product,
-                            attributes: ['name', 'price', 'disc_price', 'img']
+                            attributes: ['id', 'name', 'price', 'disc_price'],
+                            include: [
+                                {
+                                    model: ProductImage,
+                                    as: 'images',
+                                    attributes: ['img'],
+                                    where: { isPreview: true },
+                                    required: false
+                                }
+                            ]
                         }
                     ]
                 }],

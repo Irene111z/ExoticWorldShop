@@ -4,7 +4,8 @@ import { createOrder } from '../../http/orderAPI'
 import { fetchUserProfile } from '../../http/userAPI';
 import './OrderPage.css';
 import { useNavigate } from 'react-router-dom';
-import {PROFILE_ROUTE} from '../../utils/path'
+import { PROFILE_ROUTE } from '../../utils/path'
+import InputMask from "react-input-mask";
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -73,11 +74,13 @@ const OrderPage = () => {
       case 'email':
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Невірний email';
         break;
-      case 'phone':
-        if (!/^\+?\d{10,}$/.test(value)) return 'Невірний номер';
+      case 'phone': {
+        const digitsOnly = value.replace(/\D/g, '');
+        if (digitsOnly.length < 12) return 'Невірний номер';
         break;
+      }
       case 'delivery_info':
-        if (!value.trim()) return 'Поле обовʼязкове';
+        if (userData.delivery_method !== 'Самовивіз' && !value.trim()) return 'Поле обовʼязкове';
         break;
       case 'delivery_method':
         if (!value) return 'Оберіть спосіб доставки';
@@ -113,11 +116,12 @@ const OrderPage = () => {
     if (Object.keys(formErrors).length > 0) return;
 
     try {
+      const cleanedPhone = userData.phone.replace(/[^\d+]/g, '');
       const payload = {
         recipient_name: userData.name,
         recipient_lastname: userData.lastname,
         recipient_email: userData.email,
-        recipient_phone: userData.phone,
+        recipient_phone: cleanedPhone,
         delivery_method: userData.delivery_method,
         delivery_address: userData.delivery_info,
         payment_method: userData.payment_method,
@@ -132,7 +136,10 @@ const OrderPage = () => {
     }
   };
 
-  const requiredFields = ['name', 'lastname', 'email', 'phone', 'delivery_info', 'delivery_method', 'payment_method'];
+  const requiredFields = ['name', 'lastname', 'email', 'phone', 'delivery_method', 'payment_method'];
+  if (userData.delivery_method !== 'Самовивіз') {
+    requiredFields.push('delivery_info');
+  }
   const isFormValid = requiredFields.every(field => userData[field]?.trim() && !errors[field]);
 
   return (
@@ -168,11 +175,11 @@ const OrderPage = () => {
             onChange={handleChange}
           />
           {errors.email && <small className="text-danger mb-2">{errors.email}</small>}
-          <input
+          <InputMask
             name="phone"
-            type="tel"
-            placeholder="Телефон"
-            className='mb-0'
+            mask="+38 099-999-99-99"
+            className="mb-0"
+            placeholder="+38 0XX-XXX-XX-XX"
             value={userData.phone}
             onChange={handleChange}
           />
@@ -191,15 +198,20 @@ const OrderPage = () => {
             <option value="Самовивіз">Самовивіз</option>
           </select>
           {errors.delivery_method && <small className="text-danger mb-2">{errors.delivery_method}</small>}
-          <input
-            name="delivery_info"
-            type="text"
-            placeholder="Адреса доставки"
-            className='mb-0'
-            value={userData.delivery_info}
-            onChange={handleChange}
-          />
-          {errors.delivery_info && <small className="text-danger mt-2">{errors.delivery_info}</small>}
+
+          {userData.delivery_method !== 'Самовивіз' && (
+            <>
+              <input
+                name="delivery_info"
+                type="text"
+                placeholder="Адреса доставки"
+                className='mb-0'
+                value={userData.delivery_info}
+                onChange={handleChange}
+              />
+              {errors.delivery_info && <small className="text-danger mt-2">{errors.delivery_info}</small>}
+            </>
+          )}
 
           <h6 className='mt-4'><strong>Спосіб оплати:</strong></h6>
           <select

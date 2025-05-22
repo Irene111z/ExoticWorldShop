@@ -13,8 +13,16 @@
 .order-card-semibold{
     font-weight: 600;
 }
+.order-status-select{
+    border: none;
+    background-color: #F6FBF1;
+    font-weight: 600;
+}
 .order-card-item-img{
-    max-width: 60px;
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    overflow: visible;
 }
 .order-card-items {
     width: 100%;
