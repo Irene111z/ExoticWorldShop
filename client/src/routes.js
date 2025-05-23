@@ -18,30 +18,6 @@ import UserProfile from './pages/UserProfile/UserProfile';
 import * as path from '../src/utils/path'
 
 export const authRoutes = [
-    {   path: path.ORDERS_MANAGEMENT_ROUTE,
-        Component: OrdersManagement
-    },
-    {   path: path.PRODUCTS_MANAGEMENT_ROUTE,
-        Component: ProductsManagement
-    },
-    {   path: path.EDIT_PRODUCT_ROUTE + '/:id',
-        Component: EditProduct
-    },
-    {   path: path.CREATE_PRODUCT_ROUTE,
-        Component: CreateProduct
-    },
-    {   path: path.CATEGORIES_MANAGEMENT_ROUTE,
-        Component: CategoriesManagement
-    },
-    {   path: path.POSTS_MANAGEMENT_ROUTE,
-        Component: PostsManagement
-    },
-    {   path: path.EDIT_POST_ROUTE + '/:id',
-        Component: EditPost
-    },
-    {   path: path.CREATE_POST_ROUTE,
-        Component: CreatePost
-    },
     {
         path: path.WISHLIST_ROUTE,
         Component: Wishlist
@@ -82,4 +58,38 @@ export const publicRoutes = [
         Component: PostPage
     },
 
+]
+export const adminRoutes = [
+    {
+        path: path.ORDERS_MANAGEMENT_ROUTE,
+        Component: OrdersManagement
+    },
+    {
+        path: path.PRODUCTS_MANAGEMENT_ROUTE,
+        Component: ProductsManagement
+    },
+    {
+        path: path.EDIT_PRODUCT_ROUTE + '/:id',
+        Component: EditProduct
+    },
+    {
+        path: path.CREATE_PRODUCT_ROUTE,
+        Component: CreateProduct
+    },
+    {
+        path: path.CATEGORIES_MANAGEMENT_ROUTE,
+        Component: CategoriesManagement
+    },
+    {
+        path: path.POSTS_MANAGEMENT_ROUTE,
+        Component: PostsManagement
+    },
+    {
+        path: path.EDIT_POST_ROUTE + '/:id',
+        Component: EditPost
+    },
+    {
+        path: path.CREATE_POST_ROUTE,
+        Component: CreatePost
+    },
 ]

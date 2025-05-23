@@ -6,8 +6,13 @@ export const createOrder = async (data) => {
   return response.data;
 }
 // Отримати список замовлень користувача
-export const fetchUserOrderList = async () => {
+export const fetchUserOrders = async () => {
   const { data } = await $authHost.get('/api/order');
+  return data;
+}
+//Скасувати замовлення (для користувача)
+export const cancelOrder = async (id) => {
+  const { data } = await $authHost.patch(`/api/order/${id}/cancel`);
   return data;
 }
 //Отримати усі замовлення (для адміну)

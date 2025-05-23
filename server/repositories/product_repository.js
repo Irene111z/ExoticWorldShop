@@ -1,4 +1,4 @@
-const { Product, ProductFeatures, Category, Review, ProductImage, User } = require('../models/models')
+const { Product, ProductFeatures, Category, Review, ProductImage, User, Brand } = require('../models/models')
 const { Op } = require("sequelize");
 const sequelize = require('../database');
 
@@ -23,16 +23,27 @@ class ProductRepository {
             where: filter,
             limit,
             offset,
+            attributes: ["id", "categoryId", "price", "disc_price", "name", "quantity", "createdAt"],
             include: [
                 {
                     model: ProductImage,
                     as: 'images',
+                    where: {isPreview: true},
                     required: false
                 },
                 {
                     model: Review,
                     attributes: ['rate'],
                     required: false
+                },
+                {
+                    model: ProductFeatures,
+                    as: 'productFeatures',
+                    attributes:["name", "description", "productId"]
+                },
+                {
+                    model: Brand,
+                    attributes: ["id", "name"]
                 }
             ]
         });

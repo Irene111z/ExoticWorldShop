@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import './OrderCard.css'
 import moment from 'moment'
 import 'moment/locale/uk'
-import { changeOrderStatus } from '../../../http/orderAPI'
+import { changeOrderStatus, cancelOrder } from '../../../http/orderAPI'
+import { Context } from '../../..'
 
 const statuses = [
     "Очікує підтвердження",
@@ -13,6 +14,7 @@ const statuses = [
 ]
 
 const OrderCard = ({ id, order, onStatusChange }) => {
+    const { user } = useContext(Context);
     const accordionId = `accordionFlush-${id}`
     const headingId = `flush-heading-${id}`
     const collapseId = `flush-collapse-${id}`
@@ -38,6 +40,21 @@ const OrderCard = ({ id, order, onStatusChange }) => {
         }
     }
 
+    const handleCancelOrder = async () => {
+        const confirmed = window.confirm('Ви точно бажаєте скасувати замовлення?');
+        if (!confirmed) return;
+
+        try {
+            const updatedOrder = await cancelOrder(order.id);
+            setStatus("Скасовано");
+            if (onStatusChange) {
+                onStatusChange(updatedOrder);
+            }
+        } catch (error) {
+            console.error('Помилка скасування замовлення:', error);
+        }
+    }
+
     return (
         <div className="accordion accordion-flush my-2" id={accordionId}>
             <div className="accordion-item">
@@ -46,15 +63,23 @@ const OrderCard = ({ id, order, onStatusChange }) => {
                         <div className="d-flex flex-column w-100">
                             <div className="d-flex justify-content-between">
                                 <p className='order-card-semibold mb-2'>№{order.id}</p>
-                                <select
-                                    className='order-status-select'
-                                    value={status}
-                                    onChange={handleStatusChange}
-                                >
-                                    {statuses.map(s => (
-                                        <option key={s} value={s}>{s.toLowerCase()}</option>
-                                    ))}
-                                </select>
+                                {user.isAdmin ? (
+                                    <select
+                                        className='order-status-select'
+                                        value={status}
+                                        onChange={handleStatusChange}
+                                    >
+                                        {statuses.map(s => (
+                                            <option key={s} value={s}>{s.toLowerCase()}</option>
+                                        ))}
+                                    </select>
+                                ) :
+                                    (
+                                        <div className="d-flex flex-column">
+                                            <p className='order-status-select mb-0'> {status}</p>
+                                            {["Відправлено", "Виконано", "Скасовано"].includes(status) ? <span></span> : <button className='user-profile-cansel-order my-2' onClick={handleCancelOrder}>Скасувати</button>}
+                                        </div>
+                                    )}
                             </div>
                             <div className="d-flex justify-content-between">
                                 <div className="d-flex flex-column align-items-start">

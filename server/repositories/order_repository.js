@@ -96,7 +96,7 @@ class OrderRepository {
         if (!order) {
             throw new Error("Замовлення не знайдено")
         }
-        if (["Відправлено", "Доставлено", "Скасовано"].includes(order.status)) {
+        if (["Відправлено", "Виконано", "Скасовано"].includes(order.status)) {
             throw new Error('Скасування замовлення на даному етапі неможливе');
         }
         await order.update({ status: "Скасовано" })

@@ -51,7 +51,7 @@ const AuthForm = observer(({ onClose }) => {
         const cleanedPhone = phone.replace(/[^\d+]/g, '');
         console.log("phone", cleanedPhone)
         const data = await registration(email, password, name, lastname, cleanedPhone, img);
-        user.setUser(user);
+        user.setUser(data);
         user.setIsAuth(true);
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
@@ -64,8 +64,15 @@ const AuthForm = observer(({ onClose }) => {
         e.preventDefault();
         let data;
         data = await login(email, password)
-        user.setUser(user)
+        user.setUser(data)
         user.setIsAuth(true)
+        user.setIsAuth(true)
+        if(data.role === "admin"){
+            user.setIsAdmin(true)
+        }
+        else{
+            user.setIsAdmin(false)
+        }
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
         navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);

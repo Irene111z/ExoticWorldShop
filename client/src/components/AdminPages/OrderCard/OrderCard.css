@@ -1,5 +1,5 @@
 .order-card{
-    background-color: #F6FBF1;
+    background-color: #fff;
     font-size: 14px;
     font-weight: 500;
     font-family: 'Montserrat';
@@ -15,7 +15,7 @@
 }
 .order-status-select{
     border: none;
-    background-color: #F6FBF1;
+    background-color: #fff;
     font-weight: 600;
 }
 .order-card-item-img{
@@ -29,7 +29,17 @@
     border-spacing: 0 10px;
     border-collapse: separate;
 }
-
+.user-profile-cansel-order{
+    border: none;
+    background-color: #858585;
+    padding: 0.25rem;
+    border-radius: 5px;
+    color: #fff;
+}
+.user-profile-cansel-order:hover{
+    background-color: #5F6368;
+    transition: all 0.3s;
+}
 .accordion-button::after {
     display: none;
 }

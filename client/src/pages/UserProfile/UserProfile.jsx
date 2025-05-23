@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { fetchUserProfile, updateUserProfile } from '../../http/userAPI';
+import { fetchUserOrders } from '../../http/orderAPI'
 import './UserProfile.css'
-import {Context} from '../../index'
+import { Context } from '../../index'
 import { useNavigate } from 'react-router-dom';
+import OrderCard from '../../components/AdminPages/OrderCard/OrderCard';
 
 const UserProfile = () => {
-  const {user} = useContext(Context)
+  const { user } = useContext(Context)
   const navigate = useNavigate();
-  const logout = () =>{
+  const logout = () => {
     user.setUser({})
     user.setIsAuth(false)
     localStorage.removeItem('token');
@@ -27,6 +29,8 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [orders, setOrders] = useState([])
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -72,6 +76,10 @@ const UserProfile = () => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    fetchUserOrders().then(data => setOrders(data)).catch(console.error)
+  }, [])
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -99,12 +107,12 @@ const UserProfile = () => {
   return loading ? (
     <div>Завантаження профілю...</div>
   ) : (
-    <div className="container-fluid container-xxl">
-      <div className="d-flex flex-column">
+    <div className="container-fluid container-xxl d-flex">
+      <div className="d-flex flex-column me-5">
         <form onSubmit={handleSubmit} className='user-profile-form mt-4'>
           <div className="d-flex mb-3 flex-row-reverse user-profile-icons">
-            <img src="/static/edit-icon-white.svg" alt="" className='edit-profile-icon' onClick={() => setIsEditing(true)}/>
-            <img src="/static/log-out-icon.svg" className='edit-profile-icon me-3' alt="" onClick={()=>logout()}/>
+            <img src="/static/edit-icon-white.svg" alt="" className='edit-profile-icon' onClick={() => setIsEditing(true)} />
+            <img src="/static/log-out-icon.svg" className='edit-profile-icon me-3' alt="" onClick={() => logout()} />
           </div>
           <div className='text-center'>
             <img
@@ -194,8 +202,18 @@ const UserProfile = () => {
           )}
         </form>
       </div>
-      <div className="d-flex flex-column">
-
+      <div className="d-flex flex-column mt-4 w-100">
+        {orders.length === 0 ? (
+          <p>Замовлення відсутні</p>
+        ) : (
+          orders.map((order, index) => (
+            <OrderCard
+              key={order.id}
+              id={index}
+              order={order}
+            />
+          ))
+        )}
       </div>
     </div>
   );
