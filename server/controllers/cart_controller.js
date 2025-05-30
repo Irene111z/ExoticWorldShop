@@ -11,6 +11,15 @@ class CartController{
             next(ApiError.badRequest(error.message)) 
         }
     }
+    async getCartCount(req, res, next){
+        try {
+            const userId = req.user.id
+            const count = await cart_service.getCartCount(userId)
+            return res.status(200).json(count)
+        } catch (error) {
+            next(ApiError.badRequest(error.message)) 
+        }
+    }
     async addProductToCart(req, res, next){
         try {
             const userId = req.user.id

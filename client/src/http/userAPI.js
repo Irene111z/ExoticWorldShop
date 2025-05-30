@@ -25,6 +25,18 @@ export const check_token = async () => {
   localStorage.setItem('token', data.jwt_token)
   return jwtDecode(data.jwt_token)
 }
+export const get_bookmarks_count = async () =>{
+  const res = await $authHost.get('api/bookmarks/count');
+  return res.data;
+}
+export const get_wishlist_count = async () =>{
+  const res = await $authHost.get('api/wishlist/count');
+  return res.data;
+}
+export const get_cart_count = async () =>{
+  const res = await $authHost.get('api/cart/count');
+  return res.data;
+}
 export const fetchUserProfile = async () => {
   const { data } = await $authHost.get('api/user/profile');
   return data;

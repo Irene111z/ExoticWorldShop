@@ -14,6 +14,18 @@ class BookmarksController{
             next(ApiError.badRequest(error.message)) 
         }
     }
+    async getBookmarksCount(req, res, next){
+        try {
+            const userId = req.user.id
+            if (!userId) {
+                return next(ApiError.badRequest("Користувача не знайдено"));
+            }
+            const count = await bookmarks_service.getBookmarksCount(userId)
+            return res.status(200).json(count)
+        } catch (error) {
+            next(ApiError.badRequest(error.message)) 
+        }
+    }
     async savePost(req, res, next){
         try {
             const userId = req.user.id

@@ -9,3 +9,36 @@
 .sales-home-arrows img{
     width: 40px;
 }
+.custom-arrow {
+    cursor: pointer;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+}
+
+.custom-arrow.prev {
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.custom-arrow.next {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.slider-card-wrapper {
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+.sales-home .slick-slide {
+    display: flex;
+    justify-content: center;
+}
+
+.sales-home .slick-list {
+    margin: 0 -12px;
+}

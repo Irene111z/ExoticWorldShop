@@ -15,7 +15,7 @@ const Catalog = () => {
   const [categoryPath, setCategoryPath] = useState([]);
   const [wishlistIds, setWishlistIds] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  const [filters, setFilters] = useState({}); // { featureName: [value1, value2] }
+  const [filters, setFilters] = useState({});
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
@@ -121,8 +121,9 @@ const Catalog = () => {
   const lastCategory = categoryPath.at(-1);
 
   return (
-    <div className="container-xxl py-4">
+    <div className="container-xxl py-4 ">
       <p className="mb-2 catalog-current-category">{lastCategory?.name}</p>
+
       <div className="mb-4">
         <span className='catalog-breadcrumbs'><Link to={HOMEPAGE_ROUTE}>ExoWorld</Link>{' > '}</span>
         {categoryPath.map((cat, i) => (
@@ -135,62 +136,86 @@ const Catalog = () => {
         ))}
       </div>
 
-      {/* --- Фільтри --- */}
-      <div className="mb-4">
-        <h5>Фільтри</h5>
-
-        <div className='d-flex flex-column'>
-          <strong>Ціна:</strong>
-          <div className="">
-            <input type="number" value={priceRange.min} min={minPrice}
-              onChange={e => setPriceRange({ ...priceRange, min: +e.target.value || 0 })}
-              style={{ width: '80px' }}
-            />
-            —
-            <input type="number" value={priceRange.max} max={maxPrice}
-              onChange={e => setPriceRange({ ...priceRange, max: +e.target.value || 0 })}
-              style={{ width: '80px' }}
-            />
+      <div className="row">
+        <div className="col-12 col-md-2 mb-4 catalog-filters">
+          <div className="d-flex flex-column mb-3">
+            <h6>Ціна:</h6>
+            <div className="d-flex justify-content-between" style={{color:'#fff'}}>
+              <span>{priceRange.min} ₴</span>
+              <span>{priceRange.max} ₴</span>
+            </div>
+            <div style={{ position: 'relative', height: '30px' }}>
+              <input
+                type="range"
+                min={minPrice}
+                max={maxPrice}
+                value={priceRange.min}
+                onChange={e => {
+                  const val = +e.target.value;
+                  setPriceRange(prev => ({
+                    ...prev,
+                    min: Math.min(val, prev.max),
+                  }));
+                }}
+                className="range-slider"
+              />
+              <input
+                type="range"
+                min={minPrice}
+                max={maxPrice}
+                value={priceRange.max}
+                onChange={e => {
+                  const val = +e.target.value;
+                  setPriceRange(prev => ({
+                    ...prev,
+                    max: Math.max(val, prev.min),
+                  }));
+                }}
+                className="range-slider"
+              />
+            </div>
           </div>
-        </div>
 
-        <div className='d-flex flex-column'>
-          <strong>Бренд:</strong>
-          {brandOptions.map(brand => (
-            <label key={brand.id} style={{ marginRight: '10px' }}>
-              <input type="checkbox" checked={selectedBrands.includes(brand.id)} onChange={() => toggleBrand(brand.id)} />
-              {brand.name}
-            </label>
-          ))}
-        </div>
-
-        {Object.entries(allFeatures).map(([name, values]) => (
-          <div key={name} className='d-flex flex-column'>
-            <strong>{name}</strong>
-            {[...values].map(val => (
-              <label key={val} style={{ marginRight: '10px' }}>
-                <input
-                  type="checkbox"
-                  checked={filters[name]?.includes(val) || false}
-                  onChange={() => toggleFilter(name, val)}
-                />
-                {val}
+          <div className='d-flex flex-column mb-3'>
+            <h6>Бренд:</h6>
+            {brandOptions.map(brand => (
+              <label key={brand.id} style={{ marginRight: '10px' }}>
+                <input type="checkbox" className="custom-checkbox" checked={selectedBrands.includes(brand.id)} onChange={() => toggleBrand(brand.id)} />
+                <span className="ms-2">{brand.name}</span>
               </label>
             ))}
           </div>
-        ))}
-      </div>
 
-      <div className="row row-cols-1 row-cols-xxl-5 row-cols-xl-4 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 g-4">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} wishlistIds={wishlistIds} cartItems={cartItems} />
-          ))
-        ) : (
-          <p>Нічого не знайдено за заданими фільтрами.</p>
-        )}
+          {Object.entries(allFeatures).map(([name, values]) => (
+            <div key={name} className='d-flex flex-column mb-3'>
+              <h6>{name}</h6>
+              {[...values].map(val => (
+                <label key={val} >
+                  <input
+                    type="checkbox" className="custom-checkbox"
+                    checked={filters[name]?.includes(val) || false}
+                    onChange={() => toggleFilter(name, val)}
+                  />
+                  <span className="ms-2">{val}</span>
+                </label>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="col-12 col-md-10">
+          <div className="row row-cols-1 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-4">
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map(product => (
+                <ProductCard key={product.id} product={product} wishlistIds={wishlistIds} cartItems={cartItems} />
+              ))
+            ) : (
+              <p>Нічого не знайдено за заданими фільтрами.</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
+
   );
 };
 

@@ -12,7 +12,6 @@ const HomePage = () => {
       <Sales/>
       <BlogAdd/>
       <ShopStatistic/>
-      <PetsLookingForHome/>
     </div>
   )
 }

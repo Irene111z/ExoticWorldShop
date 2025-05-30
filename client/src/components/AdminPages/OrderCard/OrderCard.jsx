@@ -75,7 +75,7 @@ const OrderCard = ({ id, order, onStatusChange }) => {
                                     </select>
                                 ) :
                                     (
-                                        <div className="d-flex flex-column">
+                                        <div className="d-flex flex-column align-items-end">
                                             <p className='order-status-select mb-0'> {status}</p>
                                             {["Відправлено", "Виконано", "Скасовано"].includes(status) ? <span></span> : <button className='user-profile-cansel-order my-2' onClick={handleCancelOrder}>Скасувати</button>}
                                         </div>

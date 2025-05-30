@@ -5,6 +5,7 @@ const roleControll = require('../middleware/RoleControllMiddleware')
 const AuthorizationMiddleware = require('../middleware/AuthorizationMiddleware')
 
 router.get('/', AuthorizationMiddleware, cart_controller.getCart)
+router.get('/count', AuthorizationMiddleware, cart_controller.getCartCount)
 router.post('/item', AuthorizationMiddleware, cart_controller.addProductToCart)
 router.delete('/item/:productId', AuthorizationMiddleware, cart_controller.deleteProductFromCart)
 router.put('/incItem', AuthorizationMiddleware, cart_controller.increaseCartItem)

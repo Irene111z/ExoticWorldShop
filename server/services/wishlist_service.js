@@ -4,6 +4,9 @@ class WishlistService{
     async getWishlist(userId){
         return await wishlist_repository.getWishlistProducts(userId)
     }
+    async getWishlistCount(userId){
+        return await wishlist_repository.getWishlistCount(userId)
+    }
     async addProduct(userId, productId){
         return await wishlist_repository.addProduct(userId, productId)
     }

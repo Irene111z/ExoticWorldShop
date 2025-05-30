@@ -8,6 +8,13 @@ class WishlistRepository{
         }
         return wishlist
     }
+    async getWishlistCount(userId){
+        const wishlist = await Wishlist.findAndCountAll({ where: { userId }});
+        if (!wishlist) {
+            throw new Error("Списку бажань не знайдено");
+        }
+        return wishlist.count
+    }
     async addProduct(userId, productId){
         const product = await Product.findByPk(productId)
         if(!product){

@@ -15,6 +15,18 @@ class WishlistController{
             next(ApiError.badRequest(error.message)) 
         }
     }
+    async getWishlistCount(req, res, next){
+        try {
+            const userId = req.user.id
+            if (!userId) {
+                return next(ApiError.badRequest("Користувача не знайдено"));
+            }
+            const count = await wishlist_service.getWishlistCount(userId)
+            return res.status(200).json(count)
+        } catch (error) {
+            next(ApiError.badRequest(error.message)) 
+        }
+    }
     async addProductToWishlist(req, res, next){
         try {
             const userId = req.user.id

@@ -4,6 +4,9 @@ class BookmarksService{
     async getBookmarks(userId){
         return await bookmarks_repository.getBookmarks(userId)
     }
+    async getBookmarksCount(userId){
+        return await bookmarks_repository.getBookmarksCount(userId)
+    }
     async addBookmark(userId, postId){
         return await bookmarks_repository.addPost(userId, postId)
     }

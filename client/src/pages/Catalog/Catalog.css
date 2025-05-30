@@ -15,3 +15,49 @@
 .catalog-breadcrumbs-disabled{
     color: #b5b5b5;
 }
+.catalog-filters{
+    color: #c6c6c6;
+}
+.catalog-filters label:hover{
+    color: #fff;
+    transition: color 0.2;
+}
+.catalog-filters h6{
+    color: #fff;
+}
+.custom-checkbox{
+    width: 16px;
+    height: 16px;
+}
+.range-slider {
+  -webkit-appearance: none;
+  background: transparent;
+  pointer-events: auto;
+  height: 30px;
+  position: absolute;
+  width: 100%;
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  top: -7px;
+  background-color: #6FB312;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+.range-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background-color: #f3f3f3;
+  border-radius: 3px;
+}
+
+input[type="checkbox"]:checked {
+  accent-color: #6FB312;
+}
+
+

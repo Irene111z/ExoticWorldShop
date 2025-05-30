@@ -28,6 +28,22 @@ class CartRepository {
             ],
         })
     }
+    async getCartCount(userId) {
+        const cart = await Cart.findOne({
+            where: { userId },
+            include: [
+                {
+                    model: CartItem,
+                },
+            ],
+        })
+        if (!cart || !cart.cart_items) {
+            return 0;
+        }
+
+        const totalCount = cart.cart_items.reduce((sum, item) => sum + item.quantity, 0);
+        return totalCount;
+    }
 
     async getCartByUserId(userId) {
         return await Cart.findOne({ where: { userId } })

@@ -6,6 +6,7 @@ import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import AuthForm from '../AuthForm/AuthForm';
 import { fetchCategories } from '../../http/productAPI';
+import {get_bookmarks_count, get_wishlist_count, get_cart_count} from '../../http/userAPI'
 import CartModal from '../CartModal/CartModal';
 
 // const CategoryItem = ({ category }) => {
@@ -73,6 +74,9 @@ const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [bookmarksCount, setBookmarksCount] = useState(0);
+    const [wishlistCount, setWishlistCount] = useState(0);
+    const [cartCount, setCartCount] = useState(0);
 
     function buildCategoryTree(categories) {
         const map = {};
@@ -97,6 +101,16 @@ const Navbar = observer(({ isHomePage }) => {
             const tree = buildCategoryTree(data);
             setCategories(tree);
         });
+        get_bookmarks_count().then(count =>{
+            setBookmarksCount(count)
+        });
+        get_wishlist_count().then(count =>{
+            setWishlistCount(count)
+        });
+        get_cart_count().then(count =>{
+            setCartCount(count)
+        });
+
     }, []);
 
     const openAuthModal = () => {
@@ -142,7 +156,7 @@ const Navbar = observer(({ isHomePage }) => {
                         </div>
                     )}
                     <div className="d-flex flex-column me-4">
-                        <div className="header-wishlist-count">38</div>
+                        {user.isAuth ? <div className="header-wishlist-count">{wishlistCount}</div> : <span/>}
                         {user.isAuth ? (
                             <Link to={WISHLIST_ROUTE} className='text-center py-0'>
                                 <img src="/static/navbar-wishlist.svg" alt="" />
@@ -154,7 +168,7 @@ const Navbar = observer(({ isHomePage }) => {
                         )}
                     </div>
                     <div className="d-flex flex-column me-4">
-                        <div className="header-saving-count">12</div>
+                        {user.isAuth ? <div className="header-saving-count">{bookmarksCount}</div> : <span/>}
                         {user.isAuth ? (
                             <Link to={BOOKMARKS_ROUTE} className='text-center py-0'>
                                 <img src="/static/navbar-saving.svg" alt="" />
@@ -166,7 +180,7 @@ const Navbar = observer(({ isHomePage }) => {
                         )}
                     </div>
                     <div className="d-flex flex-column">
-                        <div className="header-cart-count">2</div>
+                        {user.isAuth ? <div className="header-cart-count">{cartCount}</div> : <span/>}
                         {user.isAuth ? (
                             <img
                                 src="/static/navbar-cart.svg"

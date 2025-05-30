@@ -8,6 +8,13 @@ class BookmarksRepository{
         }
         return bookmarks
     }
+     async getBookmarksCount(userId){
+        const bookmarks = await Bookmarks.findAndCountAll({ where: { userId }});
+        if (!bookmarks) {
+            throw new Error("Збережені пости не знайдено");
+        }
+        return bookmarks.count
+    }
     async addPost(userId, postId){
         const post = await Post.findByPk(postId)
         if(!post){

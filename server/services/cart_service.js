@@ -4,6 +4,9 @@ class CartService{
     async getCart(userId){
         return await cart_repository.getCartProducts(userId)
     }
+    async getCartCount(userId){
+        return await cart_repository.getCartCount(userId)
+    }
     async addProductToCart(userId, productId, quantity = 1){
         const cart = await cart_repository.getCartByUserId(userId)
         await cart_repository.addCartItem(cart.id, productId, quantity)
