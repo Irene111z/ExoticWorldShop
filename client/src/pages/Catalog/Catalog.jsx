@@ -20,6 +20,8 @@ const Catalog = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100000);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 16;
 
   useEffect(() => {
     if (user?.isAuth) {
@@ -59,6 +61,8 @@ const Catalog = () => {
       setMinPrice(Math.min(...prices));
       setMaxPrice(Math.max(...prices));
       setPriceRange({ min: Math.min(...prices), max: Math.max(...prices) });
+
+      setCurrentPage(1);
     };
 
     loadData();
@@ -93,6 +97,7 @@ const Catalog = () => {
       parseFloat(p.price) >= priceRange.min && parseFloat(p.price) <= priceRange.max
     );
     setFilteredProducts(result);
+    setCurrentPage(1);
   }, [filters, priceRange, selectedBrands, products]);
 
   const toggleFilter = (name, description) => {
@@ -120,6 +125,19 @@ const Catalog = () => {
 
   const lastCategory = categoryPath.at(-1);
 
+  // Обчислюємо товари поточної сторінки
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Визначаємо загальну кількість сторінок
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="container-xxl py-4 ">
       <p className="mb-2 catalog-current-category">{lastCategory?.name}</p>
@@ -137,81 +155,107 @@ const Catalog = () => {
       </div>
 
       <div className="row">
-        <div className="col-12 col-md-2 mb-4 catalog-filters">
-          <div className="d-flex flex-column mb-3">
-            <h6>Ціна:</h6>
-            <div className="d-flex justify-content-between" style={{color:'#fff'}}>
-              <span>{priceRange.min} ₴</span>
-              <span>{priceRange.max} ₴</span>
+        {currentItems.length > 0 ?
+          (<div className="col-12 col-md-2 mb-4 catalog-filters">
+            <div className="d-flex flex-column mb-3">
+              <h6>Ціна:</h6>
+              <div className="d-flex justify-content-between" style={{ color: '#fff' }}>
+                <span>{priceRange.min} ₴</span>
+                <span>{priceRange.max} ₴</span>
+              </div>
+              <div style={{ position: 'relative', height: '30px' }}>
+                <input
+                  type="range"
+                  min={minPrice}
+                  max={maxPrice}
+                  value={priceRange.min}
+                  onChange={e => {
+                    const val = +e.target.value;
+                    setPriceRange(prev => ({
+                      ...prev,
+                      min: Math.min(val, prev.max),
+                    }));
+                  }}
+                  className="range-slider"
+                />
+                <input
+                  type="range"
+                  min={minPrice}
+                  max={maxPrice}
+                  value={priceRange.max}
+                  onChange={e => {
+                    const val = +e.target.value;
+                    setPriceRange(prev => ({
+                      ...prev,
+                      max: Math.max(val, prev.min),
+                    }));
+                  }}
+                  className="range-slider"
+                />
+              </div>
             </div>
-            <div style={{ position: 'relative', height: '30px' }}>
-              <input
-                type="range"
-                min={minPrice}
-                max={maxPrice}
-                value={priceRange.min}
-                onChange={e => {
-                  const val = +e.target.value;
-                  setPriceRange(prev => ({
-                    ...prev,
-                    min: Math.min(val, prev.max),
-                  }));
-                }}
-                className="range-slider"
-              />
-              <input
-                type="range"
-                min={minPrice}
-                max={maxPrice}
-                value={priceRange.max}
-                onChange={e => {
-                  const val = +e.target.value;
-                  setPriceRange(prev => ({
-                    ...prev,
-                    max: Math.max(val, prev.min),
-                  }));
-                }}
-                className="range-slider"
-              />
-            </div>
-          </div>
 
-          <div className='d-flex flex-column mb-3'>
-            <h6>Бренд:</h6>
-            {brandOptions.map(brand => (
-              <label key={brand.id} style={{ marginRight: '10px' }}>
-                <input type="checkbox" className="custom-checkbox" checked={selectedBrands.includes(brand.id)} onChange={() => toggleBrand(brand.id)} />
-                <span className="ms-2">{brand.name}</span>
-              </label>
-            ))}
-          </div>
-
-          {Object.entries(allFeatures).map(([name, values]) => (
-            <div key={name} className='d-flex flex-column mb-3'>
-              <h6>{name}</h6>
-              {[...values].map(val => (
-                <label key={val} >
-                  <input
-                    type="checkbox" className="custom-checkbox"
-                    checked={filters[name]?.includes(val) || false}
-                    onChange={() => toggleFilter(name, val)}
-                  />
-                  <span className="ms-2">{val}</span>
+            <div className='d-flex flex-column mb-3'>
+              <h6>Бренд:</h6>
+              {brandOptions.map(brand => (
+                <label key={brand.id} style={{ marginRight: '10px' }}>
+                  <input type="checkbox" className="custom-checkbox" checked={selectedBrands.includes(brand.id)} onChange={() => toggleBrand(brand.id)} />
+                  <span className="ms-2">{brand.name}</span>
                 </label>
               ))}
             </div>
-          ))}
-        </div>
+
+            {Object.entries(allFeatures).map(([name, values]) => (
+              <div key={name} className='d-flex flex-column mb-3'>
+                <h6>{name}</h6>
+                {[...values].map(val => (
+                  <label key={val} >
+                    <input
+                      type="checkbox" className="custom-checkbox"
+                      checked={filters[name]?.includes(val) || false}
+                      onChange={() => toggleFilter(name, val)}
+                    />
+                    <span className="ms-2">{val}</span>
+                  </label>
+                ))}
+              </div>
+            ))}
+          </div>
+          ) :
+          <span />
+        }
         <div className="col-12 col-md-10">
           <div className="row row-cols-1 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-4">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map(product => (
+            {currentItems.length > 0 ? (
+              currentItems.map(product => (
                 <ProductCard key={product.id} product={product} wishlistIds={wishlistIds} cartItems={cartItems} />
               ))
             ) : (
-              <p>Нічого не знайдено за заданими фільтрами.</p>
+              <span/>
             )}
           </div>
+          {currentItems.length <= 0 ? (
+            <p style={{color: '#fff'}}>Товарів не знайдено :(</p>
+            ) : (
+            <span/>
+            )}
+          {totalPages > 1 && (
+            <nav className="mt-4">
+              <ul className="pagination justify-content-center">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => paginate(currentPage - 1)}>&laquo;</button>
+                </li>
+                {[...Array(totalPages)].map((_, idx) => (
+                  <li key={idx + 1} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
+                    <button className="page-link" onClick={() => paginate(idx + 1)}>{idx + 1}</button>
+                  </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => paginate(currentPage + 1)}>&raquo;</button>
+                </li>
+              </ul>
+            </nav>
+          )}
         </div>
       </div>
     </div>
