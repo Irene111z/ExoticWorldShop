@@ -9,7 +9,7 @@ const PostsList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [postsPerPage] = useState(5);
+    const [postsPerPage] = useState(12);
     const [totalPosts, setTotalPosts] = useState(0);
 
     const navigate = useNavigate();
@@ -31,6 +31,7 @@ const PostsList = () => {
     }, [currentPage, postsPerPage]);
 
     const handlePageChange = (page) => {
+        if (page < 1 || page > totalPages) return; // захист від виходу за межі
         setCurrentPage(page);
     };
 
@@ -78,31 +79,38 @@ const PostsList = () => {
 
             {/* Пагінація */}
             {totalPages > 1 && (
-                <div className="pagination">
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="btn btn-secondary"
-                    >
-                        Попередня
-                    </button>
-                    {[...Array(totalPages)].map((_, index) => (
-                        <button
-                            key={index + 1}
-                            onClick={() => handlePageChange(index + 1)}
-                            className={`btn ${currentPage === index + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
-                        >
-                            {index + 1}
-                        </button>
-                    ))}
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="btn btn-secondary"
-                    >
-                        Наступна
-                    </button>
-                </div>
+                <nav className="mt-4">
+                    <ul className="pagination justify-content-center">
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                aria-label="Previous"
+                            >
+                                &laquo;
+                            </button>
+                        </li>
+                        {[...Array(totalPages)].map((_, idx) => (
+                            <li key={idx + 1} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
+                                <button
+                                    className="page-link"
+                                    onClick={() => handlePageChange(idx + 1)}
+                                >
+                                    {idx + 1}
+                                </button>
+                            </li>
+                        ))}
+                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                            <button
+                                className="page-link"
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                aria-label="Next"
+                            >
+                                &raquo;
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
             )}
         </div>
     );

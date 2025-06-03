@@ -2,8 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { fetchAuthors, createPost, createAuthor } from '../../http/blogAPI';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
+import {useNavigate} from 'react-router-dom'
+import {POSTS_MANAGEMENT_ROUTE} from '../../utils/path'
 
 const CreatePost = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: '',
     preview: '',
@@ -22,7 +26,6 @@ const CreatePost = () => {
   });
   const [isCreatingNewAuthor, setIsCreatingNewAuthor] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
-  const [embeddedImages, setEmbeddedImages] = useState([]); // { file, dataUrl }
 
   const fileInputRef = useRef(null);
   const handleClick = () => {
@@ -108,13 +111,13 @@ const CreatePost = () => {
     formDataToSend.append('preview', formData.preview);
     selectedAuthors.forEach(author => formDataToSend.append('authorIds', author.id));
 
-    console.log('📤 Дані, що відправляються на бекенд:');
-for (let pair of formDataToSend.entries()) {
-  console.log(pair[0] + ':', pair[1]);
-}
+    for (let pair of formDataToSend.entries()) {
+      console.log(pair[0] + ':', pair[1]);
+    }
     try {
       await createPost(formDataToSend);
       alert('Пост успішно створено!');
+      navigate(POSTS_MANAGEMENT_ROUTE);
       setFormData({ title: '', preview: '', content: '' });
       setSelectedAuthors([]);
       setPreviewUrl('');
@@ -131,7 +134,7 @@ for (let pair of formDataToSend.entries()) {
           <div className="d-flex flex-column me-3">
             <label htmlFor="preview">Обкладинка</label>
             {previewUrl && (
-              <img src={previewUrl} alt="Preview" style={{ width: '350px', height: 'auto', borderRadius: '10px' }} className='mb-2'/>
+              <img src={previewUrl} alt="Preview" style={{ width: '350px', height: 'auto', borderRadius: '10px' }} className='mb-2' />
             )}
             <button type="button" className="btn-add-post-preview mb-2" onClick={handleClick}>
               Додати обкладинку

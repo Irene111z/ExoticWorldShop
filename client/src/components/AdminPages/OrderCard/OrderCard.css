@@ -1,10 +1,15 @@
-.order-card{
-    background-color: #fff;
+.order-card, .order-card-green{
     font-size: 14px;
     font-weight: 500;
     font-family: 'Montserrat';
     color: #000000;
     border: none;
+}
+.order-card{
+    background-color: #fff;
+}
+.order-card-green{
+    background-color: #F6FBF1;
 }
 .order-card-gray-text{
     color: #5F6368;
@@ -15,7 +20,7 @@
 }
 .order-status-select{
     border: none;
-    background-color: #fff;
+    background-color: transparent;
     font-weight: 600;
 }
 .order-card-item-img{

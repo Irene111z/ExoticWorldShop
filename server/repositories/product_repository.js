@@ -23,6 +23,7 @@ class ProductRepository {
             where: filter,
             limit,
             offset,
+            distinct: true,
             attributes: ["id", "categoryId", "price", "disc_price", "name", "quantity", "createdAt"],
             include: [
                 {

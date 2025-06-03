@@ -4,33 +4,31 @@ import { useNavigate } from "react-router-dom";
 import { EDIT_PRODUCT_ROUTE } from '../../../utils/path';
 import { fetchProducts } from '../../../http/productAPI';
 
-const ProductList = () => {
+const ProductList = ({ searchTerm }) => {
     const [products, setProducts] = useState([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const limit = 12;
     const navigate = useNavigate();
 
-    const loadProducts = async (currentPage) => {
-        const data = await fetchProducts({ limit, page: currentPage });
-        if (data.rows.length < limit) {
-            setHasMore(false);
-        }
-        if (currentPage === 1) {
-            setProducts(data.rows);
-        } else {
-            setProducts(prev => [...prev, ...data.rows]);
-        }
+    const loadProducts = async (page, search) => {
+        // Передаємо searchTerm як параметр запиту (потрібно щоб бекенд підтримував фільтрацію)
+        const data = await fetchProducts({ limit, page, search });
+        setProducts(data.rows);
+        setTotalPages(Math.ceil(data.count / limit));
     };
 
     useEffect(() => {
-        loadProducts(1);
-    }, []);
+        setCurrentPage(1);  // при зміні пошуку скидаємо сторінку на 1
+    }, [searchTerm]);
 
-    const loadMore = () => {
-        const nextPage = page + 1;
-        setPage(nextPage);
-        loadProducts(nextPage);
+    useEffect(() => {
+        loadProducts(currentPage, searchTerm);
+    }, [currentPage, searchTerm]);
+
+    const paginate = (pageNumber) => {
+        if (pageNumber < 1 || pageNumber > totalPages) return;
+        setCurrentPage(pageNumber);
     };
 
     return (
@@ -75,10 +73,22 @@ const ProductList = () => {
                 </tbody>
             </table>
 
-            {hasMore && (
-                <div className='text-center my-4'>
-                    <button onClick={loadMore} className='btn btn-primary'>Показати ще</button>
-                </div>
+            {totalPages > 1 && (
+                <nav className="mt-4">
+                    <ul className="pagination justify-content-center">
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                            <button className="page-link" onClick={() => paginate(currentPage - 1)}>&laquo;</button>
+                        </li>
+                        {[...Array(totalPages)].map((_, idx) => (
+                            <li key={idx + 1} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
+                                <button className="page-link" onClick={() => paginate(idx + 1)}>{idx + 1}</button>
+                            </li>
+                        ))}
+                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                            <button className="page-link" onClick={() => paginate(currentPage + 1)}>&raquo;</button>
+                        </li>
+                    </ul>
+                </nav>
             )}
         </div>
     );

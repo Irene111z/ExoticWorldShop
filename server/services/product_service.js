@@ -83,7 +83,7 @@ class ProductService {
         await product_repository.deleteProduct(id);
     }
     async getAllProducts(query) {
-        const { brandId, categoryId } = query;
+        const { brandId, categoryId, search } = query;
         const limit = Number(query.limit) || 12;
         const page = Number(query.page) || 1;
         const offset = page * limit - limit;
@@ -94,6 +94,13 @@ class ProductService {
         if (categoryId) {
             const subcategoryIds = await product_repository.getSubcategories(categoryId);
             filter.categoryId = { [Op.in]: [categoryId, ...subcategoryIds] };
+        }
+
+        if (search) {
+            filter[Op.or] = [
+                { name: { [Op.iLike]: `%${search}%` } },  // нечутливий пошук за назвою
+                isNaN(Number(search)) ? {} : { id: Number(search) }  // якщо search — число, шукаємо по id
+            ];
         }
 
         const result = await product_repository.getAllProducts(filter, limit, offset);

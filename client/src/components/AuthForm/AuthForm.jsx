@@ -67,12 +67,17 @@ const AuthForm = observer(({ onClose }) => {
         user.setUser(data)
         user.setIsAuth(true)
         user.setIsAuth(true)
-        if(data.role === "admin"){
+        if (data.role === "admin") {
             user.setIsAdmin(true)
         }
-        else{
+        else {
             user.setIsAdmin(false)
         }
+        localStorage.setItem("userData", JSON.stringify({
+            user: data,
+            isAuth: true,
+            isAdmin: data.role === "admin"
+        }));
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
         navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);

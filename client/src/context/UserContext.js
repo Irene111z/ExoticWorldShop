@@ -1,37 +1,34 @@
-import {makeAutoObservable} from 'mobx'
+import { makeAutoObservable } from 'mobx'
 
-export default class UserContext{
-    constructor(){
-        this._isAuth = false
-        this._isAdmin = false
-        this._user = {}
-        makeAutoObservable(this)
-    }
-    
-    setIsAuth(isAuth){
-        this._isAuth = isAuth
-    }
+export default class UserContext {
+    user = {};
+    isAuth = false;
+    isAdmin = false;
 
-    setIsAdmin(isAdmin){
-        this._isAdmin = isAdmin
-    }
+    constructor() {
+        makeAutoObservable(this);
 
-    setUser(user){
-        this._user = user
+        const savedData = JSON.parse(localStorage.getItem("userData"));
+        if (savedData) {
+            this.user = savedData.user;
+            this.isAuth = savedData.isAuth;
+            this.isAdmin = savedData.isAdmin;
+        }
     }
 
-    get isAuth(){
-        return this._isAuth
+    setIsAuth(isAuth) {
+        this.isAuth = isAuth;
     }
 
-    get isAdmin(){
-        return this._isAdmin
+    setIsAdmin(isAdmin) {
+        this.isAdmin = isAdmin;
     }
 
-    get user(){
-        return this._user
+    setUser(user) {
+        this.user = user;
     }
+
     get userId() {
-        return this._user?.id
+        return this.user?.id;
     }
 }

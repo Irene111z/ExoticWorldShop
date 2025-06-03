@@ -152,7 +152,7 @@ const EditPost = () => {
     try {
       await updatePost(id, formDataToSend);
       alert('Пост успішно оновлено!');
-      navigate(`/post/${id}`);
+      navigate(POSTS_MANAGEMENT_ROUTE);
     } catch (error) {
       console.error('Помилка при оновленні поста:', error);
     }

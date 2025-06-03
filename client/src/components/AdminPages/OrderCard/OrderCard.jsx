@@ -59,7 +59,7 @@ const OrderCard = ({ id, order, onStatusChange }) => {
         <div className="accordion accordion-flush my-2" id={accordionId}>
             <div className="accordion-item">
                 <h2 className="accordion-header" id={headingId}>
-                    <button className="order-card collapsed w-100 p-3" type="button" data-bs-toggle="collapse" data-bs-target={`#${collapseId}`} aria-expanded="false" aria-controls={collapseId}>
+                    <button className={user.isAdmin ? "order-card-green collapsed w-100 p-3" : "order-card collapsed w-100 p-3"} type="button" data-bs-toggle="collapse" data-bs-target={`#${collapseId}`} aria-expanded="false" aria-controls={collapseId}>
                         <div className="d-flex flex-column w-100">
                             <div className="d-flex justify-content-between">
                                 <p className='order-card-semibold mb-2'>№{order.id}</p>
@@ -106,7 +106,7 @@ const OrderCard = ({ id, order, onStatusChange }) => {
                 </h2>
                 <div id={collapseId} className="accordion-collapse collapse" aria-labelledby={headingId} data-bs-parent={`#${accordionId}`}>
                     <hr className='m-0' />
-                    <div className="accordion-body order-card">
+                    <div className={user.isAdmin ? "order-card-green accordion-body" : "order-card accordion-body"}>
                         <table className='order-card-items'>
                             <tbody>
                                 {order.order_items.map(item => {
