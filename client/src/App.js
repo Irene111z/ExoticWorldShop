@@ -7,7 +7,8 @@ import AdminNavbar from './components/Navbar/AdminNavbar';
 import Footer from './components/Footer/Footer';
 import { observer } from 'mobx-react-lite';
 import { check_token } from './http/userAPI';
-import {Context} from './index'
+import { Context } from './index'
+import { ToastProvider } from './context/ToastContext';
 
 function Layout() {
   const location = useLocation();
@@ -28,14 +29,14 @@ function Layout() {
   );
 }
 
-const App = observer(() =>{
-  const {user} = useContext(Context)
+const App = observer(() => {
+  const { user } = useContext(Context)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     console.log('Token in localStorage:', token);
-  
+
     if (token) {
       check_token()
         .then(data => {
@@ -54,16 +55,18 @@ const App = observer(() =>{
       setLoading(false);
     }
   }, []);
-  
-  
-  if(loading){
+
+
+  if (loading) {
     return <p>loading...</p>
   }
 
   return (
-    <BrowserRouter>
-      <Layout />
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <Layout />
+      </BrowserRouter>
+    </ToastProvider>
   );
 })
 

@@ -18,7 +18,10 @@ export const fetchDefaultAvatars = async () => {
 export const login = async (email, password) => {
   const { data } = await $host.post('api/user/login', { email, password })
   localStorage.setItem('token', data.jwt_token)
-  return jwtDecode(data.jwt_token)
+  return {
+    user: jwtDecode(data.jwt_token),
+    token: data.jwt_token
+  };
 }
 export const check_token = async () => {
   const { data } = await $authHost.get('api/user/check_token')

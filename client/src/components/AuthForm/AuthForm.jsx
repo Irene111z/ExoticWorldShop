@@ -53,9 +53,10 @@ const AuthForm = observer(({ onClose }) => {
         const data = await registration(email, password, name, lastname, cleanedPhone, img);
         user.setUser(data);
         user.setIsAuth(true);
+        localStorage.setItem('token', data.token);
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
-        navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
+        navigate(data.user.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
         localStorage.removeItem('redirectUrl');
     };
 
@@ -64,23 +65,24 @@ const AuthForm = observer(({ onClose }) => {
         e.preventDefault();
         let data;
         data = await login(email, password)
+        console.log("decoded token:",(data));
         user.setUser(data)
         user.setIsAuth(true)
-        user.setIsAuth(true)
-        if (data.role === "admin") {
+        if (data.user.role === "admin") {
             user.setIsAdmin(true)
         }
         else {
             user.setIsAdmin(false)
         }
+        localStorage.setItem('token', data.token);
         localStorage.setItem("userData", JSON.stringify({
             user: data,
             isAuth: true,
-            isAdmin: data.role === "admin"
+            isAdmin: data.user.role === "admin"
         }));
         onClose();
         const redirectUrl = localStorage.getItem('redirectUrl') || '/';
-        navigate(data.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
+        navigate(data.user.role === "admin" ? ORDERS_MANAGEMENT_ROUTE : redirectUrl);
         localStorage.removeItem('redirectUrl');
     }
 

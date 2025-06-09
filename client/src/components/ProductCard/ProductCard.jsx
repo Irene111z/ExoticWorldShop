@@ -1,42 +1,72 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { Context } from '../..';
 import './ProductCard.css'
 import { useNavigate } from "react-router-dom";
 import { PRODUCT_ROUTE } from '../../utils/path'
 import { addProductToWishlist, deleteProductFromWishlist, addProductToCart } from '../../http/productAPI';
+import {useToast} from '../../context/ToastContext'
+import CartModal from '../CartModal/CartModal';
 
 const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist, cartItems = [] }) => {
 
   const navigate = useNavigate();
 
   const [isInWishlist, setIsInWishlist] = useState(wishlistIds.includes(product.id));
-  const isInCart = cartItems?.some(item => item.productId === product.id);
+  const [isInCart, setIsInCart] = useState(cartItems.includes(product.id))
+  const { showToast } = useToast();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const { user } = useContext(Context);
 
   useEffect(() => {
     setIsInWishlist(wishlistIds.includes(product.id));
-  }, [wishlistIds, product.id]);
+    setIsInCart(cartItems.includes(product.id))
+  }, [wishlistIds, cartItems, product.id]);
 
   const handleToggleWishlist = async () => {
     try {
-      if (isInWishlist) {
-        await deleteProductFromWishlist(product.id);
-        setIsInWishlist(false);
-        if (onRemoveFromWishlist) {
-          onRemoveFromWishlist(product.id);
+      if (!user.isAuth) {
+        showToast('Увійдіть, щоб додавати товари до списку бажань.');
+        return;
+      }
+      else {
+        if (isInWishlist) {
+          await deleteProductFromWishlist(product.id);
+          setIsInWishlist(false);
+          if (onRemoveFromWishlist) {
+            onRemoveFromWishlist(product.id);
+          }
+        } else {
+          await addProductToWishlist(product.id);
+          setIsInWishlist(true);
         }
-      } else {
-        await addProductToWishlist(product.id);
-        setIsInWishlist(true);
+        user.updateWishlistCount();
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Помилка при оновленні списку бажаного');
+      console.error(error);
+      showToast('Помилка при додаванні в список бажань.');
     }
   };
 
   const handleAddToCart = async () => {
     try {
-      await addProductToCart(product.id);
+      if (!user.isAuth) {
+        showToast('Увійдіть, щоб додавати товари до кошику.');
+        return;
+      }
+      else{
+        if (isInCart) {
+        setIsCartOpen(true)
+      }
+      else {
+        await addProductToCart(product.id);
+        setIsInCart(true);
+      }
+      }
+      user.updateCartCount();
     } catch (error) {
-      alert(error.response?.data?.message || 'Помилка при додаванні в кошик');
+      console.error(error);
+      showToast('Помилка при додаванні в кошик.');
     }
   };
 
@@ -108,7 +138,7 @@ const ProductCard = ({ product, wishlistIds = [], onRemoveFromWishlist, cartItem
           </div>
         </div>
       </div>
-
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   )
 }

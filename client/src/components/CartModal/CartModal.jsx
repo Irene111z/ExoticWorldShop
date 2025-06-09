@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './CartModal.css';
 import { Link } from 'react-router-dom';
 import { fetchCart, increaseCartItem, decreaseCartItem, deleteProductFromCart } from '../../http/productAPI'
 import { PRODUCT_ROUTE, ORDER_ROUTE } from '../../utils/path';
+import { Context } from '../..';
 
 const CartModal = ({ isOpen, onClose }) => {
+
+    const {user} = useContext(Context);
     const [cartItems, setCartItems] = useState([]);
     const totalPrice = cartItems.reduce((sum, { quantity, product }) => {
         const price = product.disc_price ? Number(product.disc_price) : Number(product.price);
@@ -40,6 +43,7 @@ const CartModal = ({ isOpen, onClose }) => {
             setCartItems((data.cart_items || []).sort((a, b) =>
                 a.product.name.localeCompare(b.product.name, 'uk', { sensitivity: 'base' })
             ));
+            user.updateCartCount();
         } catch {
             alert('Не вдалося збільшити кількість товару');
         }
@@ -52,6 +56,7 @@ const CartModal = ({ isOpen, onClose }) => {
             setCartItems((data.cart_items || []).sort((a, b) =>
                 a.product.name.localeCompare(b.product.name, 'uk', { sensitivity: 'base' })
             ));
+            user.updateCartCount();
         } catch {
             alert('Не вдалося зменшити кількість товару');
         }
@@ -64,6 +69,7 @@ const CartModal = ({ isOpen, onClose }) => {
             setCartItems((data.cart_items || []).sort((a, b) =>
                 a.product.name.localeCompare(b.product.name, 'uk', { sensitivity: 'base' })
             ));
+            user.updateCartCount();
         } catch {
             alert('Не вдалося видалити товар з кошика');
         }

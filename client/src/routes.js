@@ -38,6 +38,10 @@ export const publicRoutes = [
         Component: HomePage
     },
     {
+        path: path.CATALOG_ROUTE,
+        Component: Catalog,
+    },
+    {
         path: path.CATALOG_ROUTE + '/:categoryId',
         Component: Catalog
     },

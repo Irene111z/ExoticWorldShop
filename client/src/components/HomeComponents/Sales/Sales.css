@@ -6,9 +6,10 @@
     font-size: 24px;
     font-weight: 600;
 }
-.sales-home-arrows img{
-    width: 40px;
+.sales-home .slick-slider {
+    padding-top: 50px;
 }
+
 .custom-arrow {
     cursor: pointer;
     z-index: 1;

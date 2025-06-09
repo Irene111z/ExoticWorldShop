@@ -1,5 +1,5 @@
 .navbar-logo{
-    width: 70px;
+    width: 80px;
 }
 /* .nav-category-wrapper {
     position: relative;
@@ -121,21 +121,13 @@
     left: 0;
     z-index: 10;
 }
-.navbar-search input[type='text'], .navbar-search button{
+.navbar-search{
     border: none;
-    background-color: rgb(122, 192, 9);
-    height: 32px;
-}
-.navbar-search input[type='text']{
-    border-radius: 10px 0 0 10px;
-    color: #fff;
-}
-.navbar-search input::placeholder{
-    color: #fff;
-    padding-left: 0.5rem;
-}
-.navbar-search button{
-    border-radius: 0 10px 10px 0;
+    border-radius: 10px;
+    width: 100%;
+    padding: 0 0.75rem;
+    background-color: rgb(255, 255, 255);
+    height: 40px;
 }
 
 .navbar-links{

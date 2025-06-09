@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { fetchProducts, fetchCategories, fetchWishlist, fetchCart } from '../../http/productAPI';
 import ProductCard from '../../components/ProductCard/ProductCard';
@@ -21,6 +21,9 @@ const Catalog = () => {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100000);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const location = useLocation();
+
   const itemsPerPage = 16;
 
   useEffect(() => {
@@ -35,8 +38,14 @@ const Catalog = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      const query = searchTerm
+        ? { search: searchTerm }
+        : categoryId
+          ? { categoryId }
+          : {}; //усі товари
+
       const [productData, allCategories] = await Promise.all([
-        fetchProducts({ categoryId }),
+        fetchProducts(query),
         fetchCategories(),
       ]);
 
@@ -66,7 +75,7 @@ const Catalog = () => {
     };
 
     loadData();
-  }, [categoryId]);
+  }, [categoryId, searchTerm]);
 
   const brandOptions = [
     ...new Map(
@@ -83,6 +92,14 @@ const Catalog = () => {
       allFeatures[f.name].add(f.description);
     })
   );
+
+  useEffect(() => {
+    setSearchTerm('');
+    setFilters({});
+    setSelectedBrands([]);
+    setPriceRange({ min: 0, max: 100000 });
+    setCurrentPage(1);
+  }, [categoryId, location.pathname]);
 
   // Фільтрація
   useEffect(() => {
@@ -140,20 +157,37 @@ const Catalog = () => {
 
   return (
     <div className="container-xxl py-4 ">
-      <p className="mb-2 catalog-current-category">{lastCategory?.name}</p>
-
-      <div className="mb-4">
-        <span className='catalog-breadcrumbs'><Link to={HOMEPAGE_ROUTE}>ExoWorld</Link>{' > '}</span>
-        {categoryPath.map((cat, i) => (
-          <span key={cat.id} className='catalog-breadcrumbs'>
-            {i === categoryPath.length - 1
-              ? <span className='catalog-breadcrumbs-disabled'>{cat.name}</span>
-              : <Link to={`${CATALOG_ROUTE}/${cat.id}`}>{cat.name}</Link>}
-            {i < categoryPath.length - 1 && ' > '}
-          </span>
-        ))}
+      <div className="d-flex justify-content-between align-items-end mb-4">
+        <div className="">
+          <p className="mb-2 catalog-current-category">
+            {searchTerm ? 'Результати пошуку' : lastCategory?.name}
+          </p>
+          <div className="">
+            <span className='catalog-breadcrumbs'>
+              <Link to={HOMEPAGE_ROUTE}>ExoWorld</Link>{' > '}
+            </span>
+            {searchTerm ? (
+              <>
+                <span className='catalog-breadcrumbs'>
+                  <Link to={CATALOG_ROUTE}>Усі товари</Link>{' > '}
+                </span>
+                <span className='catalog-breadcrumbs-disabled'>Результати пошуку</span>
+              </>
+            ) : categoryPath.length === 0 ? (
+              <span className='catalog-breadcrumbs-disabled'>Усі товари</span>
+            ) : (
+              categoryPath.map((cat, i) => (
+                <span key={cat.id} className='catalog-breadcrumbs'>
+                  {i === categoryPath.length - 1
+                    ? <span className='catalog-breadcrumbs-disabled'>{cat.name}</span>
+                    : <Link to={`${CATALOG_ROUTE}/${cat.id}`}>{cat.name}</Link>}
+                  {i < categoryPath.length - 1 && ' > '}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
       </div>
-
       <div className="row">
         {currentItems.length > 0 ?
           (<div className="col-12 col-md-2 mb-4 catalog-filters">
@@ -225,20 +259,21 @@ const Catalog = () => {
           <span />
         }
         <div className="col-12 col-md-10">
+          <input type="text" placeholder='Пошук' className='navbar-search mb-4' value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           <div className="row row-cols-1 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-3 row-cols-md-2 g-4">
             {currentItems.length > 0 ? (
               currentItems.map(product => (
                 <ProductCard key={product.id} product={product} wishlistIds={wishlistIds} cartItems={cartItems} />
               ))
             ) : (
-              <span/>
+              <span />
             )}
           </div>
           {currentItems.length <= 0 ? (
-            <p style={{color: '#fff'}}>Товарів не знайдено :(</p>
-            ) : (
-            <span/>
-            )}
+            <p style={{ color: '#fff' }}>Товарів не знайдено :(</p>
+          ) : (
+            <span />
+          )}
           {totalPages > 1 && (
             <nav className="mt-4">
               <ul className="pagination justify-content-center">

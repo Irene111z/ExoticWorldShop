@@ -6,7 +6,6 @@ import { Context } from '../../index';
 import { observer } from 'mobx-react-lite';
 import AuthForm from '../AuthForm/AuthForm';
 import { fetchCategories } from '../../http/productAPI';
-import {get_bookmarks_count, get_wishlist_count, get_cart_count} from '../../http/userAPI'
 import CartModal from '../CartModal/CartModal';
 
 // const CategoryItem = ({ category }) => {
@@ -74,9 +73,6 @@ const Navbar = observer(({ isHomePage }) => {
     const { user } = useContext(Context);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [categories, setCategories] = useState([]);
-    const [bookmarksCount, setBookmarksCount] = useState(0);
-    const [wishlistCount, setWishlistCount] = useState(0);
-    const [cartCount, setCartCount] = useState(0);
 
     function buildCategoryTree(categories) {
         const map = {};
@@ -101,17 +97,13 @@ const Navbar = observer(({ isHomePage }) => {
             const tree = buildCategoryTree(data);
             setCategories(tree);
         });
-        get_bookmarks_count().then(count =>{
-            setBookmarksCount(count)
-        });
-        get_wishlist_count().then(count =>{
-            setWishlistCount(count)
-        });
-        get_cart_count().then(count =>{
-            setCartCount(count)
-        });
+        if (user.isAuth) {
+            user.updateWishlistCount();
+            user.updateCartCount();
+            user.updateBookmarksCount();
+        }
 
-    }, []);
+    }, [user.isAuth]);
 
     const openAuthModal = () => {
         setShowAuthModal(true);
@@ -138,11 +130,12 @@ const Navbar = observer(({ isHomePage }) => {
                         </div>
                     </Link>
                 </div>
-                <div className="position-absolute start-50 translate-middle-x">
+                <div className="position-absolute start-50 translate-middle-x d-flex flex-column">
+                    
                     <div className="d-flex flex-row align-items-end">
                         <p className='me-5 my-0'><Link to='' className="navbar-links">Про нас</Link></p>
                         <p className='me-5 my-0'><Link to={BLOG_ROUTE} className="navbar-links">Блог</Link></p>
-                        <p className='my-0'><Link to='' className="navbar-links">Контакти</Link></p>
+                        <p className='my-0'><Link to="https://t.me/exotic_world_bot" target='_blank'className="navbar-links">АІ-асистент</Link></p>
                     </div>
                 </div>
                 <div className="ms-auto d-flex align-items-end">
@@ -156,7 +149,7 @@ const Navbar = observer(({ isHomePage }) => {
                         </div>
                     )}
                     <div className="d-flex flex-column me-4">
-                        {user.isAuth ? <div className="header-wishlist-count">{wishlistCount}</div> : <span/>}
+                        {user.isAuth ? <div className="header-wishlist-count">{user.wishlistCount}</div> : <span />}
                         {user.isAuth ? (
                             <Link to={WISHLIST_ROUTE} className='text-center py-0'>
                                 <img src="/static/navbar-wishlist.svg" alt="" />
@@ -168,7 +161,7 @@ const Navbar = observer(({ isHomePage }) => {
                         )}
                     </div>
                     <div className="d-flex flex-column me-4">
-                        {user.isAuth ? <div className="header-saving-count">{bookmarksCount}</div> : <span/>}
+                        {user.isAuth ? <div className="header-saving-count">{user.bookmarksCount}</div> : <span />}
                         {user.isAuth ? (
                             <Link to={BOOKMARKS_ROUTE} className='text-center py-0'>
                                 <img src="/static/navbar-saving.svg" alt="" />
@@ -180,7 +173,7 @@ const Navbar = observer(({ isHomePage }) => {
                         )}
                     </div>
                     <div className="d-flex flex-column">
-                        {user.isAuth ? <div className="header-cart-count">{cartCount}</div> : <span/>}
+                        {user.isAuth ? <div className="header-cart-count">{user.cartCount}</div> : <span />}
                         {user.isAuth ? (
                             <img
                                 src="/static/navbar-cart.svg"

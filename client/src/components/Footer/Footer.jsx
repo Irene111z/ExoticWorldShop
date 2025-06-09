@@ -1,5 +1,6 @@
 import React from 'react'
 import './Footer.css'
+import { BLOG_ROUTE, HOMEPAGE_ROUTE } from '../../utils/path'
 
 const Footer = () => {
   return (
@@ -10,15 +11,14 @@ const Footer = () => {
                 <div className="d-flex justify-content-between mb-5 pt-2">
                     <div className="d-flex flex-column text-center">
                         <p className='footer-title'>Інформація</p>
-                        <p className='footer-link'>Про нас</p>
-                        <p className='footer-link'>Благодійність</p>
-                        <p className='footer-link'>Блог</p>
+                        <p className='footer-link'><a href={HOMEPAGE_ROUTE}>Про нас</a></p>
+                        <p className='footer-link'>Наші магазини</p>
                     </div>
                     <div className="d-flex flex-column text-center">
                         <p className='footer-title'>Покупцю</p>
+                        <p className='footer-link'><a href={BLOG_ROUTE}>Освітній блог</a></p>
+                        <p className='footer-link'><a href="https://t.me/exotic_world_bot" target='_blank'>АІ-асистент</a></p>
                         <p className='footer-link'>Доставка та оплата</p>
-                        <p className='footer-link'>Наші магазини</p>
-                        <p className='footer-link'>Повернення</p>
                     </div>
                     <div className="d-flex flex-column text-center">
                         <p className='footer-title'>Графік роботи</p>
@@ -30,7 +30,7 @@ const Footer = () => {
                         <p className='footer-title'>Контакти</p>
                         <p className='footer-link'>+380688935000</p>
                         <p className='footer-link'>+380688935000</p>
-                        <p className='footer-link'>ExoWorldSupport@gmail.com</p>
+                        <p className='footer-link'>ExoWorld@gmail.com</p>
                     </div>
                 </div>
                 <div className="d-flex justify-content-between">

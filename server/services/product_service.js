@@ -84,9 +84,9 @@ class ProductService {
     }
     async getAllProducts(query) {
         const { brandId, categoryId, search } = query;
-        const limit = Number(query.limit) || 12;
-        const page = Number(query.page) || 1;
-        const offset = page * limit - limit;
+        // const limit = Number(query.limit) || 12;
+        // const page = Number(query.page) || 1;
+        // const offset = page * limit - limit;
 
         let filter = {};
         if (brandId) filter.brandId = brandId;
@@ -103,7 +103,7 @@ class ProductService {
             ];
         }
 
-        const result = await product_repository.getAllProducts(filter, limit, offset);
+        const result = await product_repository.getAllProducts(filter);
 
         const enrichedProducts = result.rows.map(product => {
             const reviews = product.reviews || [];

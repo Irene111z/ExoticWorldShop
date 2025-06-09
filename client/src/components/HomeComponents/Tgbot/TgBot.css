@@ -1,0 +1,32 @@
+.tg-bot-container {
+  color: #fff;
+  font-size: 20px;
+}
+
+.tg-bot-title {
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.assistant-block{
+    background-color: #5D7947;
+    border-radius: 20px;
+    padding: 2rem;
+    width: max-content;
+    height: max-content;
+}
+.tg-bot-link{
+    background-color: #27A6E5;
+    border-radius: 15px;
+    padding: 10px 20px;
+    width: max-content;
+    color: #fff;
+    text-decoration: none;
+}
+.tg-bot-link:hover{
+    background-color: #239dda;
+    transition: all 0.3s;
+}
+.tg-bot-link img{
+    width: 20px;
+}

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { fetchPosts, fetchBookmarks } from '../../http/blogAPI';
 import PostCard from '../../components/PostCard/PostCard';
 import './Blog.css';
+import { Context } from '../..';
 
 const Blog = () => {
+  const { user } = useContext(Context)
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,13 +17,17 @@ const Blog = () => {
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const [data, bookmarks] = await Promise.all([
-          fetchPosts(currentPage, postsPerPage),
-          fetchBookmarks()
-        ]);
-        setPosts(data.posts || []);
-        setTotalPosts(data.total || 0);
-        setBookmarksIds(bookmarks.rows.map(b => b.postId));
+        const postsData = await fetchPosts(currentPage, postsPerPage);
+        setPosts(postsData.posts || []);
+        setTotalPosts(postsData.total || 0);
+
+        // Запит на закладки тільки якщо користувач авторизований
+        if (user.isAuth) {
+          const bookmarks = await fetchBookmarks();
+          setBookmarksIds(bookmarks.rows.map(b => b.postId));
+        } else {
+          setBookmarksIds([]);
+        }
       } catch (error) {
         setError('Помилка при завантаженні постів');
       } finally {
@@ -30,7 +36,7 @@ const Blog = () => {
     };
 
     loadPosts();
-  }, [currentPage, postsPerPage]);
+  }, [currentPage, postsPerPage, user.isAuth]);
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -51,7 +57,7 @@ const Blog = () => {
         <div className="row">
           {posts.map(post => (
             <div key={post.id} className="col-md-4 mb-4">
-              <PostCard post={post} bookmarksIds={bookmarksIds}/>
+              <PostCard post={post} bookmarksIds={bookmarksIds} />
             </div>
           ))}
         </div>

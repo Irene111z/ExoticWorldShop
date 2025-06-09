@@ -12,6 +12,7 @@ const AdminNavbar = () => {
   const logout=()=>{
     user.setUser({})
     user.setIsAuth(false)
+    user.setIsAdmin(false)
     localStorage.removeItem('token');
     navigate(HOMEPAGE_ROUTE);
   }

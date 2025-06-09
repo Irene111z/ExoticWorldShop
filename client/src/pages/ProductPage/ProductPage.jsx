@@ -136,9 +136,11 @@ const ProductPage = observer(() => {
       if (inWishlist) {
         await deleteProductFromWishlist(product.id);
         setInWishlist(false);
+        user.updateWishlistCount();
       } else {
         await addProductToWishlist(product.id);
         setInWishlist(true);
+        user.updateWishlistCount();
       }
     } catch (err) {
       console.error('Помилка з вішлістом:', err);
@@ -160,7 +162,7 @@ const ProductPage = observer(() => {
   const handleAddToCart = async () => {
     try {
       await addProductToCart(product.id, quantity);
-
+      user.updateCartCount();
       const cartData = await fetchCart();
       const items = Array.isArray(cartData?.cart_items) ? cartData.cart_items : [];
       setCartItems(items);
