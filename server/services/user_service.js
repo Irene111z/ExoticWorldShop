@@ -38,12 +38,11 @@ class UserService {
             throw new Error(`Користувача не існує`);
         }
 
-        // Якщо аватар дефолтний, то завантажуємо нове фото на Cloudinary
+        //якщо аватар дефолтний, завантажуємо новий кастомний
         if (user.img.startsWith('users/default')) {
             if (files && files.img) {
                 const { img } = files;
                 if (img.mimetype.startsWith('image')) {
-                    // Завантаження на Cloudinary
                     const uploadResponse = await cloudinary.uploader.upload(img.tempFilePath, {
                         folder: 'users/custom',
                     });
@@ -53,13 +52,13 @@ class UserService {
                 }
             }
         } else if (files && files.img) {
-            // Якщо аватар вже в папці custom, спочатку видаляємо старий
+            //якщо аватар кастомний, видаляємо старий
             const publicId = user.img.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(`users/custom/${publicId}`);
 
             const { img } = files;
             if (img.mimetype.startsWith('image')) {
-                // Завантажуємо новий аватар на Cloudinary
+                //завантажуємо новий
                 const uploadResponse = await cloudinary.uploader.upload(img.tempFilePath, {
                     folder: 'users/custom',
                 });
@@ -68,8 +67,6 @@ class UserService {
                 throw new Error('Файл не є зображенням');
             }
         }
-
-        // Оновлюємо дані користувача в БД
         return await user_repository.updateUserProfile(id, data);
     }
 

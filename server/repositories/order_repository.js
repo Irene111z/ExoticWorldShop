@@ -1,62 +1,80 @@
 const { model } = require('../database')
 const { Product, Order, OrderItem, CartItem, Cart, ProductImage } = require('../models/models')
+const sequelize = require('../database');
 
 class OrderRepository {
     async createOrderFromCart(userId, data) {
-
-        const { delivery_method, delivery_address, payment_method, recipient_name, recipient_lastname, recipient_phone, recipient_email, comment } = data
+        const {
+            delivery_method, delivery_address, payment_method,
+            recipient_name, recipient_lastname, recipient_phone, recipient_email, comment
+        } = data;
 
         if (delivery_method !== "Самовивіз" && !delivery_address) {
-            throw new Error('Вкажіть адресу доставки')
+            throw new Error('Вкажіть адресу доставки');
         }
 
-        const cart = await Cart.findOne({ where: { userId } })
+        const cart = await Cart.findOne({ where: { userId } });
         if (!cart) {
-            throw new Error('Кошик не знайдений')
+            throw new Error('Кошик не знайдений');
         }
 
-        const cartItems = await CartItem.findAndCountAll({ where: { cartId: cart.id } })
+        const cartItems = await CartItem.findAndCountAll({ where: { cartId: cart.id } });
         if (cartItems.count === 0) {
-            throw new Error('Кошик порожній')
+            throw new Error('Кошик порожній');
         }
 
-        //count total
-        let total = 0
-        const products = await Promise.all(cartItems.rows.map(item => Product.findByPk(item.productId)));
-        for (let i = 0; i < cartItems.rows.length; i++) {
-            if (products[i].disc_price === null) {
-                total += cartItems.rows[i].quantity * products[i].price
-            }
-            else {
-                total += cartItems.rows[i].quantity * products[i].disc_price
+        const transaction = await sequelize.transaction();
+
+        try {
+            let total = 0;
+            const products = await Promise.all(
+                cartItems.rows.map(item => Product.findByPk(item.productId, { transaction }))
+            );
+
+            for (let i = 0; i < cartItems.rows.length; i++) {
+                const price = products[i].disc_price ?? products[i].price;
+                total += cartItems.rows[i].quantity * price;
             }
 
+            const order = await Order.create({
+                userId,
+                total,
+                delivery_method,
+                delivery_address,
+                payment_method,
+                recipient_name,
+                recipient_lastname,
+                recipient_phone,
+                recipient_email,
+                comment
+            }, { transaction });
+
+            for (let item of cartItems.rows) {
+                await OrderItem.create({
+                    quantity: item.quantity,
+                    productId: item.productId,
+                    orderId: order.id
+                }, { transaction });
+
+                await item.destroy({ transaction });
+
+                const product = await Product.findByPk(item.productId, { transaction });
+                if (product) {
+                    product.quantity -= item.quantity;
+                    if (product.quantity < 0) product.quantity = 0;
+                    await product.save({ transaction });
+                }
+            }
+
+            await transaction.commit();
+            return order;
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
-
-        //create an order
-        const order = await Order.create({ userId, total, delivery_method, delivery_address, payment_method, recipient_name, recipient_lastname, recipient_phone, recipient_email, comment })
-
-        //create order items and delete this items from cart
-        for (let item of cartItems.rows) {
-            await OrderItem.create({
-                quantity: item.quantity,
-                productId: item.productId,
-                orderId: order.id
-            });
-
-            await item.destroy();
-
-            // Зменшити кількість товару на складі
-            const product = await Product.findByPk(item.productId);
-            if (product) {
-                product.quantity -= item.quantity;
-                if (product.quantity < 0) product.quantity = 0;
-                await product.save();
-            }
-        }
-
-        return order
     }
+
     async getUserOrders(userId) {
         const orders = await Order.findAll({
             where: { userId },
