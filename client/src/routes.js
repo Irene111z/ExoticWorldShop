@@ -29,7 +29,11 @@ export const authRoutes = [
     {
         path: path.PROFILE_ROUTE,
         Component: UserProfile
-    }
+    },
+    {
+        path: path.ORDER_ROUTE,
+        Component: OrderPage
+    },
 ]
 export const publicRoutes = [
 
@@ -52,10 +56,6 @@ export const publicRoutes = [
     {
         path: path.BLOG_ROUTE,
         Component: Blog
-    },
-    {
-        path: path.ORDER_ROUTE,
-        Component: OrderPage
     },
     {
         path: path.POST_ROUTE + '/:id',
