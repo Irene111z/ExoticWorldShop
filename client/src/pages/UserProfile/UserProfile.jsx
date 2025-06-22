@@ -205,7 +205,7 @@ const UserProfile = () => {
       </div>
       <div className="d-flex flex-column mt-4 w-100">
         {orders.length === 0 ? (
-          <p>Замовлення відсутні</p>
+          <p style={{color:'#fff'}}>Замовлення відсутні</p>
         ) : (
           orders.map((order, index) => (
             <OrderCard
