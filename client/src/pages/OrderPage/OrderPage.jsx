@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { fetchCart } from '../../http/productAPI';
 import { createOrder } from '../../http/orderAPI'
 import { fetchUserProfile } from '../../http/userAPI';
@@ -6,9 +6,11 @@ import './OrderPage.css';
 import { useNavigate } from 'react-router-dom';
 import { PROFILE_ROUTE } from '../../utils/path'
 import InputMask from "react-input-mask";
+import { Context } from '../..';
 
 const OrderPage = () => {
   const navigate = useNavigate();
+  const {user} = useContext(Context)
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -129,8 +131,8 @@ const OrderPage = () => {
       };
 
       await createOrder(payload);
+      user.updateCartCount();
       navigate(PROFILE_ROUTE);
-      alert('Замовлення успішно оформлено!');
     } catch (error) {
       alert(error.response?.data?.message || 'Помилка при створенні замовлення');
     }
