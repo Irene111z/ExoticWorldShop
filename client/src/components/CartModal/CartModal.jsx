@@ -7,7 +7,7 @@ import { Context } from '../..';
 
 const CartModal = ({ isOpen, onClose }) => {
 
-    const {user} = useContext(Context);
+    const { user } = useContext(Context);
     const [cartItems, setCartItems] = useState([]);
     const totalPrice = cartItems.reduce((sum, { quantity, product }) => {
         const price = product.disc_price ? Number(product.disc_price) : Number(product.price);
@@ -139,13 +139,18 @@ const CartModal = ({ isOpen, onClose }) => {
                     <p className='text-end'>Усього товарів на суму: {totalPrice.toFixed(2).replace(/\.00$/, '')} грн.</p>
                     <div className="d-flex">
                         <button className="btn-continue-shopping me-4" onClick={onClose}>Продовжити покупки</button>
-                        <Link
-                            to={ORDER_ROUTE}
-                            className="btn-go-to-order-form"
-                            onClick={onClose}
-                        >
-                            Оформити замовлення
-                        </Link>
+                        {cartItems.length === 0 ? (
+                            <span
+                                className="btn-go-to-order-form disabled"
+                                style={{ opacity: 0.5}}
+                            >
+                                Оформити замовлення
+                            </span>
+                        ) : (
+                            <Link to={ORDER_ROUTE} className="btn-go-to-order-form" onClick={onClose}>
+                                Оформити замовлення
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
