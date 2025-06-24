@@ -18,10 +18,12 @@ class ProductRepository {
             product.destroy()
         }
     }
-    async getAllProducts(filter) {
+    async getAllProducts(filter, limit, offset) {
         return await Product.findAndCountAll({
             where: filter,
             distinct: true,
+            limit,
+            offset,
             attributes: ["id", "categoryId", "price", "disc_price", "name", "quantity", "createdAt"],
             include: [
                 {

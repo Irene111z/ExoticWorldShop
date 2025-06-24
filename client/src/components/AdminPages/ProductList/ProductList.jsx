@@ -12,14 +12,13 @@ const ProductList = ({ searchTerm }) => {
     const navigate = useNavigate();
 
     const loadProducts = async (page, search) => {
-        // Передаємо searchTerm як параметр запиту (потрібно щоб бекенд підтримував фільтрацію)
         const data = await fetchProducts({ limit, page, search });
         setProducts(data.rows);
         setTotalPages(Math.ceil(data.count / limit));
     };
 
     useEffect(() => {
-        setCurrentPage(1);  // при зміні пошуку скидаємо сторінку на 1
+        setCurrentPage(1);
     }, [searchTerm]);
 
     useEffect(() => {
